@@ -15,6 +15,7 @@ import Settings from './pages/Settings'
 import WellBeing from './pages/WellBeing'
 import ErrorRepository from './pages/ErrorRepository'
 import DiagnosticAI from './pages/DiagnosticAI'
+import SimuladoMode from './pages/SimuladoMode'
 
 function Layout() {
   const location = useLocation()
@@ -42,6 +43,7 @@ function Layout() {
             <Route path="/diagnostico" element={<DiagnosticAI />} />
             <Route path="/erros" element={<ErrorRepository />} />
             <Route path="/bem-estar" element={<WellBeing />} />
+            <Route path="/simulado" element={<SimuladoMode />} />
             <Route path="/configuracoes" element={<Settings />} />
           </Routes>
         </main>

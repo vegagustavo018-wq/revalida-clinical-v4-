@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Stethoscope, BookOpen, FlaskConical,
   MessageSquare, CreditCard, ClipboardList, Search,
-  Heart, Settings, ChevronLeft, ChevronRight, Brain
+  Heart, Settings, ChevronLeft, ChevronRight, Brain, Trophy
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -15,6 +15,7 @@ const NAV = [
   { to: '/comunicacao', icon: MessageSquare, label: 'Comunicação' },
   { to: '/diagnostico', icon: Brain, label: 'Diagnóstico IA' },
   { to: '/erros', icon: ClipboardList, label: 'Erros Comuns' },
+  { to: '/simulado', icon: Trophy, label: 'Simulado' },
   { to: '/bem-estar', icon: Heart, label: 'Bem-estar' },
   { to: '/configuracoes', icon: Settings, label: 'Configurações' },
 ]

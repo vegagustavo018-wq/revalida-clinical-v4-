@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Stethoscope, CreditCard, ClipboardList,
   MoreHorizontal, Search, BookOpen, MessageSquare, Brain,
-  Heart, Settings, X
+  Heart, Settings, X, Trophy
 } from 'lucide-react'
 
 const MAIN_NAV = [
@@ -18,6 +18,7 @@ const MORE_NAV = [
   { to: '/referencias', icon: BookOpen, label: 'Referências' },
   { to: '/comunicacao', icon: MessageSquare, label: 'Comunicação' },
   { to: '/diagnostico', icon: Brain, label: 'Diagnóstico IA' },
+  { to: '/simulado', icon: Trophy, label: 'Simulado' },
   { to: '/bem-estar', icon: Heart, label: 'Bem-estar' },
   { to: '/configuracoes', icon: Settings, label: 'Config.' },
 ]

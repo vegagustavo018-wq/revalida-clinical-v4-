@@ -4,7 +4,7 @@ import {
   Stethoscope, CreditCard, ClipboardList, BookOpen,
   Search, MessageSquare, Brain, Flame, Trophy,
   TrendingUp, Clock, ChevronRight, Zap, CheckCircle,
-  Target, AlertCircle
+  Target, AlertCircle, GraduationCap
 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
@@ -25,6 +25,7 @@ const QUICK_NAV = [
   { to: '/referencias', icon: BookOpen,    label: 'Referências',  desc: 'Labs, critérios, fórmulas', from: 'from-amber-600', to_: 'to-amber-800' },
   { to: '/explorador',  icon: Search,      label: 'Explorador',   desc: 'Doenças por sistema',   from: 'from-teal-600',    to_: 'to-teal-800'    },
   { to: '/comunicacao', icon: MessageSquare,label: 'Comunicação', desc: '90 frases clínicas',    from: 'from-emerald-600', to_: 'to-emerald-800' },
+  { to: '/simulado',   icon: GraduationCap, label: 'Simulado',    desc: 'Prova cronometrada',    from: 'from-indigo-600',  to_: 'to-indigo-800'  },
 ]
 
 export default function Dashboard() {
