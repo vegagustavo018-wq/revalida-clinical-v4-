@@ -15,10 +15,10 @@ const SLIDES = [
     title: 'Revalida Clinical v4.0',
     subtitle: 'Seu parceiro de estudo para o Revalida INEP.',
     features: [
-      { icon: <Target size={16} />, text: '100 Estações Clínicas Oficiais' },
+      { icon: <Target size={16} />, text: '150 Estações Clínicas no Formato Revalida' },
       { icon: <CreditCard size={16} />, text: '200 Flashcards em 11 Categorias' },
-      { icon: <ClipboardList size={16} />, text: '60 Erros Comentados com Condutas' },
-      { icon: <BookOpen size={16} />, text: 'Referências, Fármacos e Mnemônicos' },
+      { icon: <ClipboardList size={16} />, text: '300 Doenças no Explorador Clínico' },
+      { icon: <BookOpen size={16} />, text: 'Simulado, Referências, Erros e Mnemônicos' },
     ],
   },
   {

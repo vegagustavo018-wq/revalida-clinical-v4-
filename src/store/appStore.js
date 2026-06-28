@@ -109,4 +109,25 @@ export const useAppStore = create((set, get) => ({
       localStorage.setItem('dailySessionDate', JSON.stringify(today))
     }
   },
+
+  // WellBeing checklist (persisted, resets daily)
+  wellBeingChecklist: saved('wellBeingChecklist', {}),
+  wellBeingDate: saved('wellBeingDate', ''),
+  toggleWellBeingItem: (idx) => {
+    const today = new Date().toISOString().slice(0, 10)
+    const { wellBeingDate, wellBeingChecklist } = get()
+    const currentChecklist = wellBeingDate === today ? wellBeingChecklist : {}
+    const updated = { ...currentChecklist, [idx]: !currentChecklist[idx] }
+    set({ wellBeingChecklist: updated, wellBeingDate: today })
+    localStorage.setItem('wellBeingChecklist', JSON.stringify(updated))
+    localStorage.setItem('wellBeingDate', JSON.stringify(today))
+  },
+  checkWellBeingChecklist: () => {
+    const today = new Date().toISOString().slice(0, 10)
+    if (get().wellBeingDate !== today) {
+      set({ wellBeingChecklist: {}, wellBeingDate: today })
+      localStorage.setItem('wellBeingChecklist', JSON.stringify({}))
+      localStorage.setItem('wellBeingDate', JSON.stringify(today))
+    }
+  },
 }))

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Play, Pause, RotateCcw, Coffee, Moon, Zap, Heart, BookOpen, Brain, CheckCircle } from 'lucide-react'
+import { useAppStore } from '../store/appStore'
 
 // ── Pomodoro ──────────────────────────────────────────────────
 const PHASES = [
@@ -171,9 +172,12 @@ const CHECKLIST = [
 ]
 
 export default function WellBeing() {
-  const [checked, setChecked] = useState({})
+  const { wellBeingChecklist, toggleWellBeingItem, checkWellBeingChecklist } = useAppStore()
+
+  useEffect(() => { checkWellBeingChecklist() }, [])
+
   const total = CHECKLIST.length
-  const done = Object.values(checked).filter(Boolean).length
+  const done = Object.values(wellBeingChecklist).filter(Boolean).length
 
   return (
     <div className="overflow-y-auto h-full">
@@ -200,11 +204,11 @@ export default function WellBeing() {
           </div>
           <div className="space-y-2">
             {CHECKLIST.map((item, i) => (
-              <button key={i} onClick={() => setChecked(c => ({ ...c, [i]: !c[i] }))}
+              <button key={i} onClick={() => toggleWellBeingItem(i)}
                 className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors
-                  ${checked[i] ? 'bg-green-900/20 border border-green-700/30' : 'bg-gray-800 hover:bg-gray-700 border border-transparent'}`}>
-                <CheckCircle size={18} className={checked[i] ? 'text-green-400' : 'text-gray-600'} />
-                <span className={`text-sm ${checked[i] ? 'text-green-300 line-through' : 'text-gray-300'}`}>{item}</span>
+                  ${wellBeingChecklist[i] ? 'bg-green-900/20 border border-green-700/30' : 'bg-gray-800 hover:bg-gray-700 border border-transparent'}`}>
+                <CheckCircle size={18} className={wellBeingChecklist[i] ? 'text-green-400' : 'text-gray-600'} />
+                <span className={`text-sm ${wellBeingChecklist[i] ? 'text-green-300 line-through' : 'text-gray-300'}`}>{item}</span>
               </button>
             ))}
           </div>

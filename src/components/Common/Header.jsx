@@ -11,6 +11,7 @@ const PAGE_TITLES = {
   '/diagnostico': 'Diagnóstico IA',
   '/erros': 'Repositório de Erros',
   '/bem-estar': 'Bem-estar',
+  '/simulado': 'Simulado Revalida',
   '/configuracoes': 'Configurações',
 }
 
