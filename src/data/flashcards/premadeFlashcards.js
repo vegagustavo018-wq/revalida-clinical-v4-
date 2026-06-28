@@ -1432,4 +1432,146 @@ export const FLASHCARDS = [
     fraseParaPaciente: 'Vou te explicar o que estou pensando em relação ao diagnóstico e como chegaremos à resposta.',
     categoria: 'Diagnóstico', dificuldade: 'Avançado', especialidade: 'Clínica Geral', tags: ['Raciocínio Clínico', 'Diagnóstico', 'Diferencial']
   },
+
+  // ─── FARMACOLOGIA ─────────────────────────────────────────────
+  {
+    id: 'fc201', frente: 'Qual o mecanismo e principal indicação da Metformina?',
+    verso: 'Mecanismo: Ativa AMPK → ↓ gliconeogênese hepática + ↑ sensibilidade à insulina. Indicação: DM tipo 2 (1ª linha). NÃO causa hipoglicemia em monoterapia. Contraindicada: ClCr <30 mL/min e antes de contraste iodado IV.',
+    dica: 'Metformina = 1ª linha no DM2 independente do peso. Suspender 48h antes de contraste iodado.',
+    fraseParaPaciente: 'Este remédio ajuda seu organismo a usar melhor a insulina que você já produz. Tome sempre com as refeições.',
+    categoria: 'Farmacologia', dificuldade: 'Fundamental', especialidade: 'Endocrinologia', tags: ['DM', 'Metformina', 'Antidiabético']
+  },
+  {
+    id: 'fc202', frente: 'Quais os efeitos adversos mais importantes do Ciprofloxacino?',
+    verso: 'Black box: Tendinite + ruptura de tendão de Aquiles (risco ↑ com corticoide + idosos) | Neuropatia periférica | QT longo. Interação crítica: antiácidos com Fe/Al/Mg ↓ absorção — tomar 2h antes. Evitar em <18 anos e grávidas.',
+    dica: 'Quinolona + corticoide + idoso = tendão de Aquiles. Sempre alertar.',
+    fraseParaPaciente: 'Evite antiácidos, leite e suplementos de ferro enquanto usa este antibiótico. Pare e me avise se sentir dor no tendão.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Infectologia', tags: ['Quinolona', 'Ciprofloxacino', 'Antibiótico']
+  },
+  {
+    id: 'fc203', frente: 'Como usar a Enoxaparina para tratamento de TVP/TEP?',
+    verso: 'Dose terapêutica: 1 mg/kg SC 12/12h OU 1,5 mg/kg SC 1×/dia. Monitorar Anti-Xa se obeso, grávida ou IR. Plaquetas a cada 2-3 dias (TIH). Antídoto: Protamina (reverte ~60%). Ajustar se ClCr <30 mL/min.',
+    dica: 'Enoxaparina NÃO precisa de TTPa — diferença da HNF. Anti-Xa só em casos especiais.',
+    fraseParaPaciente: 'Vou ensinar como aplicar esta injeção na barriga. É importante não esquecer nenhuma dose.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Hematologia', tags: ['Anticoagulante', 'Enoxaparina', 'TVP', 'TEP']
+  },
+  {
+    id: 'fc204', frente: 'Qual a dose e indicação da Dexametasona na Meningite Bacteriana?',
+    verso: '0,15 mg/kg IV 6/6h × 4 dias. INICIAR ANTES ou junto com o ATB. Reduz sequelas auditivas (especialmente H. influenzae e Pneumococcus). Meningococo: benefício menor mas não prejudica.',
+    dica: 'Dexametasona na meningite: ANTES do ATB se possível. Se ATB já iniciado há >1h: não iniciar mais.',
+    fraseParaPaciente: 'Estou dando um remédio anti-inflamatório junto com o antibiótico para proteger seu sistema nervoso.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Infectologia / Neurologia', tags: ['Dexametasona', 'Meningite', 'Corticoide']
+  },
+  {
+    id: 'fc205', frente: 'Qual o risco do Omeprazol com Clopidogrel?',
+    verso: 'Omeprazol inibe CYP2C19 → ↓ ativação do Clopidogrel → ↓ efeito antiplaquetário → ↑ risco de eventos cardiovasculares. Solução: usar Pantoprazol (menor interação com CYP2C19) quando IBP for necessário com Clopidogrel.',
+    dica: 'Clopidogrel + IBP: preferir PANTOPRAZOL. Nunca prescrever omeprazol sem pensar nessa interação.',
+    fraseParaPaciente: 'Troquei o protetor gástrico por um que não interfere no seu remédio para o coração.',
+    categoria: 'Farmacologia', dificuldade: 'Avançado', especialidade: 'Cardiologia', tags: ['Omeprazol', 'Clopidogrel', 'Interação', 'IBP']
+  },
+  {
+    id: 'fc206', frente: 'Quais as indicações e doses de Salbutamol na Emergência?',
+    verso: 'Asma aguda: 2,5-5 mg nebulização a cada 20 min x 3 (ou 4-8 jatos com espaçador). Hipercalemia grave: 10-20 mg nebulizado (desloca K para intracelular — efeito transitório 30-60 min). Sempre associar tratamento definitivo.',
+    dica: 'Salbutamol em alta dose nebulizado = adjuvante na hipercalemia. NÃO substitui Ca2+ nem diálise.',
+    fraseParaPaciente: 'Esta inalação vai abrir os brônquios rapidamente. Respire fundo e devagar durante a nebulização.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Emergência / Pneumologia', tags: ['Salbutamol', 'Asma', 'Hipercalemia', 'Broncodilatador']
+  },
+  {
+    id: 'fc207', frente: 'Quando usar Morfina e como reverter sua toxicidade?',
+    verso: 'Indicações: dor aguda grave, dor oncológica, EAP (vasodilata e reduz pré-carga). Toxicidade: miose puntiforme + depressão respiratória + nível de consciência baixo = tríade. Antídoto: Naloxona 0,4 mg IV (titular 0,04-0,1 mg a cada 2 min). Sempre prescrevir LAXANTE junto.',
+    dica: 'Miose + bradipneia + sonolência = opiácea. Naloxona: não reverter abruptamente — causa dor severa.',
+    fraseParaPaciente: 'Este remédio é muito eficaz para a dor, mas pode causar sonolência e prisão de ventre. Vou dar um laxante também.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Emergência / Analgesia', tags: ['Morfina', 'Opioide', 'Naloxona', 'Dor']
+  },
+  {
+    id: 'fc208', frente: 'Como tomar Levotiroxina corretamente?',
+    verso: 'Tomar em JEJUM, 30-60 min antes do café da manhã. Absorção reduz 30-40% com alimentos, Ca2+, Fe, antiácidos. Dose inicial em idosos/cardiopatas: 25 mcg/dia (evitar angina). Monitorar TSH a cada 6-8 semanas até estabilização.',
+    dica: 'Levotiroxina sempre em jejum. Soja, ferro, cálcio = inimigos da absorção. Ajuste lento em idosos.',
+    fraseParaPaciente: 'Tome este comprimido todo dia pela manhã em jejum, pelo menos 30 minutos antes do café. É para sempre.',
+    categoria: 'Farmacologia', dificuldade: 'Fundamental', especialidade: 'Endocrinologia', tags: ['Levotiroxina', 'Hipotireoidismo', 'T4']
+  },
+  {
+    id: 'fc209', frente: 'Quais os principais efeitos adversos da Prednisona em uso prolongado?',
+    verso: 'ENDÓCRINOS: DM, HAS, obesidade central, Cushing iatrogênico | ÓSSEO: osteoporose, necrose avascular | OLHO: catarata subcapsular, glaucoma | IMUNE: infecções oportunistas | SNC: insônia, psicose | SUPRESSÃO ADRENAL: nunca suspender abruptamente se uso >2-3 semanas.',
+    dica: 'Mnemônico COPE-ID: Cushing, Osteoporose, Psicose, Edema, Infecção, Diabetes.',
+    fraseParaPaciente: 'Este remédio é eficaz mas tem efeitos colaterais com uso prolongado. Nunca pare sem falar comigo.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Clínica Médica', tags: ['Prednisona', 'Corticoide', 'Efeitos Adversos']
+  },
+  {
+    id: 'fc210', frente: 'Qual a diferença entre Amoxicilina simples e Amoxicilina + Clavulanato?',
+    verso: 'Amoxicilina: cobre estreptococos, H. influenzae sensível, E. coli sensível. Amoxicilina + Clavulanato: adiciona cobertura de Staphylococcus aureus e bactérias beta-lactamase positivas. Indicar Amox+Clav: ITU complicada, sinusite resistente, mordeduras, infecções de pele complexas.',
+    dica: 'Rash com amoxicilina não é alergia a penicilina verdadeira. Não contraindique sem testar.',
+    fraseParaPaciente: 'Este antibiótico trata sua infecção. Se aparecer vermelhidão na pele, me avise imediatamente.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Infectologia', tags: ['Amoxicilina', 'Beta-lactâmico', 'Antibiótico']
+  },
+  {
+    id: 'fc211', frente: 'Por que o Metronidazol não pode ser usado com álcool?',
+    verso: 'Efeito dissulfiram: metronidazol inibe acetaldeído desidrogenase → acúmulo de acetaldeído → rubor, taquicardia, náusea, vômito, hipotensão. Pode ocorrer até 48h após a última dose. Orientar abstinência durante o tratamento e por 48h depois.',
+    dica: 'Metronidazol + álcool = efeito dissulfiram. Avisar o paciente SEMPRE. Gosto metálico é comum e inofensivo.',
+    fraseParaPaciente: 'Não tome nenhuma bebida alcoólica durante o tratamento e por 2 dias depois — pode causar reação séria.',
+    categoria: 'Farmacologia', dificuldade: 'Fundamental', especialidade: 'Infectologia', tags: ['Metronidazol', 'Álcool', 'Dissulfiram', 'Interação']
+  },
+  {
+    id: 'fc212', frente: 'Qual a dose e uso da Dexametasona para maturação pulmonar fetal?',
+    verso: '12 mg IM 12/12h x 2 doses. Indicação: 24-34 semanas com risco de parto prematuro. Efeito: aumenta surfactante fetal e reduz síndrome do desconforto respiratório (SDR). Benefício máximo: 24h a 7 dias após a 2ª dose. Betametasona também usada: 12 mg IM 24/24h x 2 doses.',
+    dica: 'Maturação pulmonar: 24-34 semanas, risco de parto em menos de 7 dias. 2 doses de dexametasona ou betametasona.',
+    fraseParaPaciente: 'Vou aplicar duas injeções para amadurecer o pulmão do bebê. É muito importante se ele nascer antes do tempo.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Gineco-Obstetrícia', tags: ['Dexametasona', 'Maturação', 'Prematuridade', 'GO']
+  },
+  {
+    id: 'fc213', frente: 'Como identificar e manejar Trombocitopenia Induzida por Heparina (TIH)?',
+    verso: 'Ocorre entre D4-D14 após início da heparina. Queda de plaquetas >50% do basal ou abaixo de 100.000. Paradoxal: trombose apesar de plaquetas baixas. Diagnóstico: score 4T + anticorpos anti-FP4. Conduta: SUSPENDER HEPARINA (HNF e HBPM) + iniciar argatroban ou fondaparinux. NUNCA dar varfarina na fase aguda.',
+    dica: 'TIH: plaquetas caem D4-D14 + TROMBOSE. Não é sangramento. Suspender toda heparina e trocar anticoagulante.',
+    fraseParaPaciente: 'O anticoagulante causou uma reação rara. Vou trocar por outro mais seguro para você.',
+    categoria: 'Farmacologia', dificuldade: 'Avançado', especialidade: 'Hematologia', tags: ['TIH', 'Heparina', 'Plaquetopenia', 'Trombose']
+  },
+  {
+    id: 'fc214', frente: 'Quais os IBPs e quando escolher cada um?',
+    verso: 'Todos inibem H+/K+-ATPase irreversivelmente. OMEPRAZOL: mais usado, mais interações CYP2C19. PANTOPRAZOL: preferir com clopidogrel, disponível IV. LANSOPRAZOL: boa biodisponibilidade. Indicações: DRGE, úlcera, erradicação H. pylori, profilaxia por AINE, sangramento GI via IV.',
+    dica: 'IBP + Clopidogrel = preferir Pantoprazol. IBP IV pós-hemostasia: 80mg bolus + 8mg/h por 72h.',
+    fraseParaPaciente: 'Este remédio reduz o ácido do estômago. Tome 30 minutos antes do café da manhã para melhor efeito.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Gastroenterologia', tags: ['IBP', 'Omeprazol', 'Pantoprazol', 'DRGE']
+  },
+  {
+    id: 'fc215', frente: 'Quais são as regras de ouro na prescrição de antibióticos?',
+    verso: '1) Identificar foco e agente provável | 2) Colher culturas ANTES de iniciar ATB (exceto meningite/sepse grave: ATB em menos de 1h) | 3) Escolher ATB com menor espectro eficaz | 4) Definir duração (maioria 5-7 dias) | 5) Reavaliar em 48-72h: desescalonamento se possível | 6) Nunca prescrever ATB para viral.',
+    dica: 'Mnemônico CARPE: Culturas antes, Agente provável, Reavalie 48h, Prazo definido, Escalone se necessário.',
+    fraseParaPaciente: 'Este antibiótico é específico para a sua infecção. Tome todos os dias pelo tempo indicado, mesmo melhorando.',
+    categoria: 'Farmacologia', dificuldade: 'Fundamental', especialidade: 'Infectologia', tags: ['Antibiótico', 'Prescrição', 'Stewardship']
+  },
+  {
+    id: 'fc216', frente: 'Qual o mecanismo e uso da Furosemida na emergência?',
+    verso: 'Inibe co-transportador Na-K-2Cl na alça de Henle → diurese potente. Indicações: EAP (reduz pré-carga), IC descompensada, edema grave, hipercalemia, hipercalcemia. Dose EAP: 40-80 mg IV rápido (vasodilatação imediata, diurese em 30 min). Efeitos adversos: hipocalemia e hipomagnesemia.',
+    dica: 'Furosemida no EAP: vasodilatação venosa imediata reduz pré-carga. Repor K+ se uso prolongado.',
+    fraseParaPaciente: 'Este remédio vai eliminar o excesso de líquido pelo xixi. Você vai urinar bastante — é normal.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Cardiologia / Emergência', tags: ['Furosemida', 'Diurético', 'IC', 'EAP']
+  },
+  {
+    id: 'fc217', frente: 'Quais são as indicações do MgSO4 (Sulfato de Magnésio)?',
+    verso: '1) Eclâmpsia: 4-6g IV lento ataque + 1-2g/h manutenção. 2) Pré-eclâmpsia grave (profilaxia de convulsão). 3) Torsade de Pointes: 2g IV em 5-10 min. 4) Asma grave refratária: 2g IV em 20 min. Toxicidade: perda reflexo patelar (Mg 7-10), parada resp (>12). Antídoto: Gluconato de cálcio 1g IV.',
+    dica: 'MgSO4 na eclâmpsia: monitorar reflexo patelar + diurese. Antídoto: gluconato de cálcio 1g IV.',
+    fraseParaPaciente: 'Estou colocando magnésio no soro para proteger você e o bebê de convulsões.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'GO / Emergência', tags: ['MgSO4', 'Eclâmpsia', 'Pré-eclâmpsia', 'Torsades']
+  },
+  {
+    id: 'fc218', frente: 'Qual o mecanismo e interações do Warfarin (Varfarina)?',
+    verso: 'Inibe vitamina K epóxido redutase → reduz fatores II, VII, IX, X e proteínas C e S. INR alvo: FA/TEV = 2-3. Valva mecânica = 2,5-3,5. Interações: antibióticos (aumenta INR), rifampicina (reduz INR), AINEs (aumenta sangramento). Antídoto: vitamina K + plasma fresco ou CCP se urgência.',
+    dica: 'Warfarin: couve e brócolis em excesso reduzem o efeito (vitamina K dietética). Manter dieta consistente.',
+    fraseParaPaciente: 'Mantenha a alimentação constante — couve e brócolis em excesso podem reduzir o efeito do remédio.',
+    categoria: 'Farmacologia', dificuldade: 'Avançado', especialidade: 'Hematologia / Cardiologia', tags: ['Warfarin', 'Anticoagulante', 'INR', 'Interações']
+  },
+  {
+    id: 'fc219', frente: 'Quais são os beta-bloqueadores e quando usar cada classe?',
+    verso: 'Seletivos (metoprolol, atenolol, bisoprolol): IC, HAS, pós-IAM, FA — preferir em asmáticos se necessário. Não seletivos (propranolol): enxaqueca, tremor, varizes (reduz pressão portal). Carvedilol (alfa+beta): IC com FE reduzida. Contraindicações: asma grave, BAVT, bradicardia <60, choque cardiogênico.',
+    dica: 'IC com FE reduzida: Carvedilol ou metoprolol/bisoprolol. IAM: metoprolol. Varizes esofágicas: propranolol.',
+    fraseParaPaciente: 'Este remédio protege seu coração. Não pare de tomar sem avisar — parada abrupta pode ser perigosa.',
+    categoria: 'Farmacologia', dificuldade: 'Intermediário', especialidade: 'Cardiologia', tags: ['Beta-bloqueador', 'Metoprolol', 'Carvedilol', 'IC']
+  },
+  {
+    id: 'fc220', frente: 'Como classificar e manejar Reações Adversas a Medicamentos (RAM)?',
+    verso: 'Classificação OMS: A (previsível/dose-dependente — ex: hemorragia por heparina), B (imprevisível/idiossincrática — ex: anafilaxia), C (crônica — ex: osteoporose por corticoide), D (tardia — ex: carcinogênese), E (fim de uso — ex: supressão adrenal). Notificar ao NOTIVISA/ANVISA. Manejar: suspender agente, tratar reação, registrar.',
+    dica: 'RAM tipo A: mais comum, dose-dependente. Tipo B: rara, imprevisível — nunca reexpor.',
+    fraseParaPaciente: 'Tive que mudar seu medicamento porque você teve uma reação. Vou anotar que este remédio deve ser evitado.',
+    categoria: 'Farmacologia', dificuldade: 'Avançado', especialidade: 'Farmacologia Clínica', tags: ['RAM', 'Farmacovigilância', 'Reação Adversa']
+  },
 ]

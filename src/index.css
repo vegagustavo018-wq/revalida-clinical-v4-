@@ -55,3 +55,55 @@
     width: 100%;
   }
 }
+
+/* ── Light Mode ─────────────────────────────────────────────── */
+.light ::-webkit-scrollbar-thumb { background: #94a3b8; }
+.light ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Backgrounds */
+.light,
+.light.bg-gray-950,
+.light .bg-gray-950 { background-color: #f1f5f9 !important; }
+.light .bg-gray-900 { background-color: #ffffff !important; }
+.light .bg-gray-800 { background-color: #f8fafc !important; }
+.light .bg-gray-700 { background-color: #e2e8f0 !important; }
+
+/* Transparent / backdrop variants */
+.light header        { background-color: rgba(255,255,255,0.95) !important; }
+.light .bg-black\/30 { background-color: rgba(0,0,0,0.06) !important; }
+.light .bg-gray-700\/50 { background-color: rgba(226,232,240,0.6) !important; }
+.light .bg-gray-900\/30 { background-color: rgba(241,245,249,0.8) !important; }
+.light .bg-gray-900\/20 { background-color: rgba(241,245,249,0.7) !important; }
+.light .bg-gray-900\/60 { background-color: rgba(255,255,255,0.9) !important; }
+
+/* Text */
+.light .text-white  { color: #0f172a !important; }
+.light .text-gray-100 { color: #1e293b !important; }
+.light .text-gray-200 { color: #334155 !important; }
+.light .text-gray-300 { color: #475569 !important; }
+.light .text-gray-400 { color: #64748b !important; }
+.light .text-gray-500 { color: #94a3b8 !important; }
+.light .text-gray-600 { color: #a0aec0 !important; }
+
+/* Borders */
+.light .border-gray-800 { border-color: #e2e8f0 !important; }
+.light .border-gray-700 { border-color: #cbd5e1 !important; }
+.light .border-b        { border-color: #e2e8f0 !important; }
+.light .divide-gray-800 > * { border-color: #e2e8f0 !important; }
+
+/* Hover states */
+.light .hover\:bg-gray-700:hover { background-color: #e2e8f0 !important; }
+.light .hover\:bg-gray-800:hover { background-color: #f1f5f9 !important; }
+.light .hover\:bg-gray-600:hover { background-color: #cbd5e1 !important; }
+.light .hover\:text-white:hover  { color: #0f172a !important; }
+
+/* Inputs & textareas */
+.light input,
+.light textarea,
+.light select {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+.light input::placeholder,
+.light textarea::placeholder { color: #94a3b8 !important; }

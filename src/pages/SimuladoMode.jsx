@@ -176,6 +176,7 @@ function ActiveSession({ station, stationIdx, totalStations, runningScore, onFin
 // ── Resultados ────────────────────────────────────────────────
 function ResultsScreen({ stations, results, onRestart, onBack }) {
   const { addStationHistory } = useAppStore()
+  const [expandedStation, setExpandedStation] = useState(null)
 
   useEffect(() => {
     results.forEach(r => {
@@ -215,29 +216,61 @@ function ResultsScreen({ stations, results, onRestart, onBack }) {
           </div>
         </div>
 
-        {/* Por estação */}
+        {/* Por estação — expansível com revisão de checklist */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Por estação</p>
-          <div className="space-y-3">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Por estação · toque para revisar</p>
+          <div className="space-y-2">
             {results.map((r, i) => {
               const pct = r.score.max > 0 ? (r.score.total / r.score.max) * 100 : 0
               const criticalMissed = r.station.checklist.filter((item, idx) => item.critico && !r.checked[idx])
+              const isOpen = expandedStation === i
               return (
-                <div key={i} className="space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm text-gray-300 flex-1 truncate">{r.station.titulo}</p>
-                    <span className={`text-sm font-bold shrink-0 ${pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
-                      {pct.toFixed(0)}%
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-gray-800 rounded-full">
-                    <div className={`h-full rounded-full ${pct >= 70 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                      style={{ width: `${pct}%` }} />
-                  </div>
-                  {criticalMissed.length > 0 && (
-                    <p className="text-xs text-red-400 flex items-center gap-1">
-                      <AlertTriangle size={11} /> {criticalMissed.length} crítico{criticalMissed.length > 1 ? 's' : ''} perdido{criticalMissed.length > 1 ? 's' : ''}
-                    </p>
+                <div key={i} className="border border-gray-800 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setExpandedStation(isOpen ? null : i)}
+                    className="w-full text-left p-3 hover:bg-gray-800/50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <p className="text-sm text-gray-300 flex-1 truncate font-medium">{r.station.titulo}</p>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`text-sm font-bold ${pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+                          {pct.toFixed(0)}%
+                        </span>
+                        <ChevronRight size={14} className={`text-gray-500 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+                      </div>
+                    </div>
+                    <div className="h-1.5 bg-gray-800 rounded-full">
+                      <div className={`h-full rounded-full ${pct >= 70 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                        style={{ width: `${pct}%` }} />
+                    </div>
+                    {criticalMissed.length > 0 && (
+                      <p className="text-xs text-red-400 flex items-center gap-1 mt-1.5">
+                        <AlertTriangle size={11} /> {criticalMissed.length} crítico{criticalMissed.length > 1 ? 's' : ''} perdido{criticalMissed.length > 1 ? 's' : ''}
+                      </p>
+                    )}
+                  </button>
+
+                  {isOpen && (
+                    <div className="border-t border-gray-800 bg-gray-800/30 p-3 space-y-1.5">
+                      {r.station.checklist.map((item, idx) => {
+                        const done = !!r.checked[idx]
+                        return (
+                          <div key={idx} className={`flex items-start gap-2 p-2 rounded-lg ${done ? 'bg-green-900/20' : 'bg-red-900/10'}`}>
+                            <span className={`text-base leading-none mt-0.5 shrink-0 ${done ? 'text-green-400' : 'text-red-400'}`}>
+                              {done ? '✓' : '✗'}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className={`text-xs leading-snug ${done ? 'text-green-300' : 'text-red-300'}`}>{item.item}</p>
+                              <div className="flex gap-2 mt-0.5">
+                                <span className="text-[10px] text-gray-500">{item.pontos} pts</span>
+                                {item.critico && <span className="text-[10px] text-red-400 font-medium">⚡ CRÍTICO</span>}
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                      <p className="text-xs text-gray-500 text-right pt-1">{r.score.total.toFixed(1)} / {r.score.max} pts</p>
+                    </div>
                   )}
                 </div>
               )

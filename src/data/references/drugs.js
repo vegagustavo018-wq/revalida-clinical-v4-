@@ -485,4 +485,400 @@ export const DRUGS = [
     perola: 'HPP: misoprostol 800 µg SL + ocitocina 20 UI IV = primeira linha. Ergometrina se disponível.',
     blackBox: null
   },
+
+  // ── Antibióticos Orais ───────────────────────────────────────
+  {
+    id: 'amoxicilina',
+    nome: 'Amoxicilina / Amoxicilina + Clavulanato',
+    generico: 'amoxicilina triidratada / amoxicilina + clavulanato de potássio',
+    classe: 'Aminopenicilina (± inibidor de β-lactamase)',
+    categoria: 'Infectologia',
+    mecanismo: 'Inibe a síntese da parede celular bacteriana ligando-se às PBPs (penicillin-binding proteins)',
+    indicacoes: [
+      'Otite média aguda', 'Sinusite bacteriana', 'Faringite estreptocócica', 'Pneumonia comunitária leve',
+      'ITU não complicada (amoxicilina + clavulanato)', 'Infecções de pele e partes moles',
+      'Profilaxia de endocardite (procedimentos dentários)', 'H. pylori (componente do esquema de erradicação)',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Faringite/sinusite', dose: '500 mg 8/8h ou 875 mg 12/12h × 7–10 dias', via: 'VO' },
+        { indicacao: 'Pneumonia comunitária leve', dose: '500 mg 8/8h ou 1g 12/12h × 5–7 dias', via: 'VO' },
+        { indicacao: 'ITU (amox+clav)', dose: '875 mg/125 mg 12/12h × 5–7 dias', via: 'VO' },
+        { indicacao: 'Profilaxia endocardite', dose: '2g dose única 30–60 min antes do procedimento', via: 'VO' },
+      ],
+      crianca: [
+        { indicacao: 'Otite/sinusite/pneumonia', dose: '40–90 mg/kg/dia ÷ 8/8h (máx 500 mg/dose)', via: 'VO' },
+      ]
+    },
+    interacoes: ['Warfarina (↑ INR)', 'Anticoncepcional oral (↓ eficácia — orientar método adicional)', 'Alopurinol (↑ risco de exantema)'],
+    efeitosAdversos: {
+      comuns: ['Diarreia', 'Náusea', 'Exantema maculopapular', 'Candidíase oral/vaginal'],
+      graves: ['Anafilaxia (0,01–0,05%)', 'Colite pseudomembranosa (C. difficile)', 'Hepatite colestática (amox+clav)'],
+    },
+    contraindicacoes: ['Alergia a penicilinas', 'Uso com amoxicilina + clavulanato se disfunção hepática grave'],
+    monitoracao: ['Avaliar exantema (distinguir de anafilaxia vs. rash viral)', 'Função hepática se uso prolongado de amox+clav'],
+    perola: 'Rash maculopapular com amoxicilina ≠ alergia a penicilina verdadeira (não é IgE-mediada). Testar antes de contraindiar.',
+    blackBox: null
+  },
+  {
+    id: 'ciprofloxacino',
+    nome: 'Ciprofloxacino',
+    generico: 'ciprofloxacino cloridrato',
+    classe: 'Fluoroquinolona de 2ª geração',
+    categoria: 'Infectologia',
+    mecanismo: 'Inibe DNA girase (topoisomerase II) e topoisomerase IV bacterianas → inibe replicação e reparo do DNA',
+    indicacoes: [
+      'ITU complicada e pielonefrite', 'Diarreia do viajante', 'Prostatite bacteriana',
+      'Gonocócica urogenital (resistência crescente)', 'Infecções ósseas e articulares',
+      'Profilaxia em neutropenia febril (oral)', 'Antraz (Bacillus anthracis)',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'ITU complicada / pielonefrite', dose: '500 mg 12/12h × 7–14 dias', via: 'VO' },
+        { indicacao: 'Prostatite aguda', dose: '500 mg 12/12h × 28 dias', via: 'VO' },
+        { indicacao: 'Diarreia infecciosa grave', dose: '500 mg 12/12h × 3–5 dias', via: 'VO' },
+        { indicacao: 'IV (infecções graves)', dose: '400 mg 12/12h', via: 'IV' },
+      ],
+      crianca: [
+        { indicacao: 'Uso restrito — risco cartilagem. ITU grave ou Pseudomonas', dose: '15 mg/kg 12/12h (máx 750 mg/dose)', via: 'VO ou IV' },
+      ]
+    },
+    interacoes: [
+      'Antiácidos com Al/Mg, Fe, Ca — reduzem absorção oral (tomar ciprofloxacino 2h antes ou 6h depois)',
+      'Teofilina (↑ toxicidade — ↑ nível sérico)',
+      'Warfarina (↑ INR)',
+      'QT prolongado (↑ risco com amiodarona, antipsicóticos)',
+    ],
+    efeitosAdversos: {
+      comuns: ['Náusea', 'Diarreia', 'Cefaleia', 'Tontura'],
+      graves: ['Tendinite e ruptura de tendão (especialmente tendão de Aquiles)', 'Neuropatia periférica', 'Prolongamento QT', 'Psicose / convulsões'],
+    },
+    contraindicacoes: ['Gravidez', 'Crianças <18 anos (exceto indicações específicas)', 'Hipersensibilidade a quinolonas'],
+    monitoracao: ['ECG se uso IV prolongado ou QT basal longo', 'Função renal (ajuste se ClCr <30 mL/min)'],
+    perola: 'Black box: Tendinite + neuropatia periférica. Risco ↑ em idosos e uso de corticoides. Evitar uso empírico de UTI (seleciona resistência em Pseudomonas).',
+    blackBox: 'Risco de tendinite, ruptura de tendão, neuropatia periférica e efeitos no SNC — especialmente em idosos e usuários de corticoides.'
+  },
+  {
+    id: 'metronidazol',
+    nome: 'Metronidazol',
+    generico: 'metronidazol',
+    classe: 'Nitroimidazol',
+    categoria: 'Infectologia',
+    mecanismo: 'Pró-fármaco ativado por redução anaeróbia → interfere no DNA de organismos anaeróbios e protozoários',
+    indicacoes: [
+      'Infecções anaeróbias (abscesso peritoneal, pulmonar, cerebral)',
+      'Tricomoníase / vaginose bacteriana', 'Giardíase / amebíase',
+      'C. difficile (leve a moderada — vancomicina oral é preferida grave)',
+      'H. pylori (esquema de erradicação)', 'Peritonite (associado)',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Vaginose / tricomoníase', dose: '500 mg 12/12h × 7 dias ou 2g dose única (tricomoníase)', via: 'VO' },
+        { indicacao: 'C. difficile leve', dose: '500 mg 8/8h × 10–14 dias', via: 'VO' },
+        { indicacao: 'Infecção anaeróbia grave', dose: '500 mg 8/8h', via: 'IV' },
+        { indicacao: 'Giardíase', dose: '250 mg 8/8h × 5–7 dias', via: 'VO' },
+      ],
+      crianca: [
+        { indicacao: 'Giardíase / amebíase', dose: '15 mg/kg/dia ÷ 8/8h × 5–7 dias', via: 'VO' },
+      ]
+    },
+    interacoes: ['Álcool (efeito dissulfiram — taquicardia, rubor, vômito)', 'Warfarina (↑ INR muito significativo)', 'Lítio (↑ toxicidade)'],
+    efeitosAdversos: {
+      comuns: ['Náusea', 'Gosto metálico', 'Cefaleia', 'Tontura'],
+      graves: ['Neuropatia periférica (uso prolongado)', 'Encefalopatia (raro)', 'Leucopenia'],
+    },
+    contraindicacoes: ['1º trimestre da gravidez (relativo)', 'Uso concomitante de álcool'],
+    monitoracao: ['Hemograma se uso prolongado', 'Orientar abstinência de álcool durante e 48h após'],
+    perola: 'Proibir álcool rigorosamente — efeito dissulfiram pode ser grave. Gosto metálico intenso (comum — avisar o paciente).',
+    blackBox: null
+  },
+
+  // ── Gastroprotetores / Antiácidos ────────────────────────────
+  {
+    id: 'omeprazol',
+    nome: 'Omeprazol',
+    generico: 'omeprazol',
+    classe: 'Inibidor da Bomba de Prótons (IBP)',
+    categoria: 'Gastroenterologia',
+    mecanismo: 'Inibição irreversível da H+/K+-ATPase (bomba de prótons) nas células parietais gástricas → ↓ produção de HCl',
+    indicacoes: [
+      'Úlcera péptica (gástrica e duodenal)', 'DRGE (doença do refluxo gastroesofágico)',
+      'Erradicação H. pylori (componente da tríplice terapia)', 'Síndrome de Zollinger-Ellison',
+      'Profilaxia de úlcera por AINE', 'Esofagite erosiva',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'DRGE / úlcera péptica', dose: '20–40 mg 1×/dia (jejum, 30 min antes café da manhã)', via: 'VO' },
+        { indicacao: 'H. pylori (tríplice)', dose: '20 mg 12/12h × 14 dias + amoxicilina + claritromicina', via: 'VO' },
+        { indicacao: 'Sangramento digestivo alto (EDA)', dose: '80 mg bolus IV → 8 mg/h infusão por 72h', via: 'IV' },
+        { indicacao: 'Profilaxia por AINE', dose: '20 mg/dia junto com AINE', via: 'VO' },
+      ],
+      crianca: [
+        { indicacao: 'DRGE', dose: '0,7–3,5 mg/kg/dia (máx 20 mg/dia)', via: 'VO' },
+      ]
+    },
+    interacoes: [
+      'Clopidogrel (omeprazol ↓ conversão para forma ativa — preferir pantoprazol)',
+      'Metotrexato (↑ nível sérico)',
+      'Ketoconazol / itraconazol (↓ absorção)',
+      'Vitamina B12 (↓ absorção com uso prolongado)',
+    ],
+    efeitosAdversos: {
+      comuns: ['Cefaleia', 'Diarreia', 'Náusea', 'Dor abdominal'],
+      graves: ['Nefrite intersticial aguda', 'Hipomagnesemia (uso >1 ano)', 'Fratura de quadril (uso prolongado)', '↑ risco C. difficile'],
+    },
+    contraindicacoes: ['Hipersensibilidade a benzimidazóis'],
+    monitoracao: ['Magnésio sérico se uso prolongado (>1 ano)', 'Vitamina B12 se uso >2 anos'],
+    perola: 'IBPs são MUITO prescritos sem indicação formal. Revisar necessidade regularmente. Com clopidogrel: preferir pantoprazol (menos interação com CYP2C19).',
+    blackBox: null
+  },
+
+  // ── Corticosteroides ─────────────────────────────────────────
+  {
+    id: 'prednisona',
+    nome: 'Prednisona / Prednisolona',
+    generico: 'prednisona / prednisolona',
+    classe: 'Corticosteroide sistêmico',
+    categoria: 'Clínica Médica',
+    mecanismo: 'Ligação a receptores intracelulares → ↓ transcrição de citocinas pró-inflamatórias (IL-1, IL-6, TNF-α) e ↑ lipocortina (↓ fosfolipase A2)',
+    indicacoes: [
+      'Doenças autoimunes (LES, AR, vasculites, miopatias)', 'Asma grave / DPOC exacerbado',
+      'Doença de Crohn / RCU (crise)', 'Síndrome nefrótica', 'Alergias graves',
+      'Linfoma e leucemia (componente quimioterápico)', 'Insuficiência adrenal aguda',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Anti-inflamatório/imunossupressor', dose: '0,5–1 mg/kg/dia (máx 60 mg/dia) × 4–6 semanas, com desmame gradual', via: 'VO' },
+        { indicacao: 'Asma grave / DPOC exacerbação', dose: '40–60 mg/dia × 5–7 dias (sem necessidade de desmame)', via: 'VO' },
+        { indicacao: 'Insuf. adrenal aguda (IV — hidrocortisona)', dose: '100 mg bolus → 200 mg/dia IV contínuo', via: 'IV' },
+      ],
+      crianca: [
+        { indicacao: 'Asma, síndrome nefrótica', dose: '1–2 mg/kg/dia (máx 60 mg/dia)', via: 'VO' },
+      ]
+    },
+    interacoes: [
+      'AINEs (↑ risco sangramento gastrointestinal)',
+      'Hipoglicemiantes (↑ glicemia — ajustar dose)',
+      'Anti-hipertensivos (↑ PA com corticoide)',
+      'Vacinas vivas (contraindicadas se imunossupressão significativa)',
+    ],
+    efeitosAdversos: {
+      comuns: ['Hiperglicemia', 'HAS', 'Ganho de peso', 'Insônia', 'Edema', 'Risco de infecção ↑'],
+      graves: ['Osteoporose / fratura', 'Miopatia por corticoide', 'Catarata subcapsular posterior', 'Insuficiência adrenal por desmame abrupto', 'Psicose corticoide'],
+    },
+    contraindicacoes: ['Infecção sistêmica não controlada (relativo)', 'Úlcera péptica ativa (relativo)'],
+    monitoracao: ['Glicemia capilar', 'PA', 'Densitometria óssea (uso >3 meses)', 'Suplementar Ca + vitamina D se uso prolongado'],
+    perola: 'Desmame obrigatório se uso >2–3 semanas (supressão do eixo HPA). Nunca suspender abruptamente — risco de insuficiência adrenal.',
+    blackBox: null
+  },
+  {
+    id: 'dexametasona',
+    nome: 'Dexametasona',
+    generico: 'dexametasona',
+    classe: 'Corticosteroide sintético de alta potência',
+    categoria: 'Clínica Médica / Emergência',
+    mecanismo: 'Mesmo mecanismo dos corticosteroides — 7× mais potente que prednisolona, mínima atividade mineralocorticoide',
+    indicacoes: [
+      'Edema cerebral (tumor, abscesso)', 'Meningite bacteriana (adjuvante — ↓ sequelas)',
+      'COVID-19 grave (O₂ dependente ou VM)', 'Maturação pulmonar fetal (antenatal)',
+      'Laringotraqueobronquite (crupe) — dose única', 'Êmese por quimioterapia',
+      'Anafilaxia (adjuvante após adrenalina)', 'Choque séptico refratário a vasopressores',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Edema cerebral', dose: '10 mg IV bolus → 4 mg 6/6h', via: 'IV' },
+        { indicacao: 'Meningite bacteriana', dose: '0,15 mg/kg 6/6h × 4 dias (iniciar ANTES ou com ATB)', via: 'IV' },
+        { indicacao: 'COVID-19 grave', dose: '6 mg/dia × 10 dias', via: 'VO ou IV' },
+        { indicacao: 'Maturação fetal (via IM)', dose: '12 mg IM 12/12h × 2 doses (24–34 semanas)', via: 'IM' },
+        { indicacao: 'Crupe', dose: '0,6 mg/kg dose única (máx 16 mg)', via: 'VO ou IM' },
+      ],
+      crianca: [
+        { indicacao: 'Meningite / crupe', dose: '0,15 mg/kg 6/6h (meningite) ou 0,6 mg/kg dose única (crupe)', via: 'IV ou VO' },
+      ]
+    },
+    interacoes: ['Mesmas das demais corticoesteroides', 'Rifampicina (↓ nível de dexametasona — ↑ dose pode ser necessária)'],
+    efeitosAdversos: {
+      comuns: ['Hiperglicemia', 'Insônia', 'Hipertensão', 'Euforia/disforia'],
+      graves: ['Psicose aguda', 'Necrose avascular de quadril (uso prolongado)', 'Supressão adrenal'],
+    },
+    contraindicacoes: ['Infecção sistêmica não tratada (relativo)', 'Hipersensibilidade'],
+    monitoracao: ['Glicemia', 'PA', 'Sinais de infecção'],
+    perola: 'Meningite: iniciar dexametasona ANTES ou junto com o ATB — reduz sequelas auditivas em H. influenzae e Pneumococcus.',
+    blackBox: null
+  },
+
+  // ── Anticoagulantes ──────────────────────────────────────────
+  {
+    id: 'enoxaparina',
+    nome: 'Enoxaparina (Heparina de Baixo Peso Molecular)',
+    generico: 'enoxaparina sódica',
+    classe: 'Heparina de Baixo Peso Molecular (HBPM)',
+    categoria: 'Cardiologia / Hematologia',
+    mecanismo: 'Inibe principalmente fator Xa (e menos fator IIa/trombina) via antitrombina III → bloqueia formação de trombina',
+    indicacoes: [
+      'Profilaxia de TEV (cirúrgico e clínico)', 'Tratamento de TVP e TEP',
+      'SCA (IAM sem supra + angina instável)', 'Anticoagulação em ACTP percutânea',
+      'Fibrilação atrial (ponte para varfarina)',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Profilaxia TEV (risco moderado)', dose: '40 mg SC 1×/dia', via: 'SC' },
+        { indicacao: 'Profilaxia (cirurgia ortopédica)', dose: '40 mg SC 12h antes e 40 mg/dia por 10–35 dias', via: 'SC' },
+        { indicacao: 'Tratamento TVP/TEP', dose: '1 mg/kg SC 12/12h ou 1,5 mg/kg 1×/dia', via: 'SC' },
+        { indicacao: 'SCA (IAM SSST / AI)', dose: '1 mg/kg SC 12/12h × 2–8 dias', via: 'SC' },
+      ],
+      crianca: [
+        { indicacao: 'Tratamento TVP', dose: '<2 meses: 1,5 mg/kg 12/12h; >2 meses: 1 mg/kg 12/12h', via: 'SC' },
+      ]
+    },
+    interacoes: ['AINEs e aspirina (↑ risco de sangramento)', 'Outros anticoagulantes ou trombolíticos'],
+    efeitosAdversos: {
+      comuns: ['Equimose no local de injeção', 'Hematoma', 'Trombocitopenia leve transitória'],
+      graves: ['Sangramento maior', 'Trombocitopenia induzida por heparina (TIH) — menos comum que HNF', 'Osteoporose (uso prolongado)'],
+    },
+    contraindicacoes: ['Trombocitopenia induzida por heparina prévia', 'Sangramento ativo', 'ClCr <15 mL/min (sem ajuste — preferir HNF)'],
+    monitoracao: ['Anti-Xa se obeso (>100 kg), renal, grávida. Meta 0,5–1,0 UI/mL (12/12h) ou 1,0–2,0 UI/mL (1×/dia)', 'Plaquetas a cada 2–3 dias nos primeiros 14 dias', 'Não precisa de TTPa (diferencial da HNF)'],
+    perola: 'TIH: queda plaquetas >50% entre D4–D14 → suspender e trocar por argatroban/fondaparinux. Antídoto da heparina: sulfato de protamina (reverte ~60% anti-Xa da enoxaparina).',
+    blackBox: null
+  },
+
+  // ── Analgésicos / Opioides ───────────────────────────────────
+  {
+    id: 'morfina',
+    nome: 'Morfina',
+    generico: 'sulfato de morfina',
+    classe: 'Opioide agonista µ',
+    categoria: 'Clínica Médica / Emergência',
+    mecanismo: 'Agonista dos receptores µ-opioide (e κ, δ) no SNC e periférico → analgesia, sedação, ↓ reflexo da tosse, vasodilatação venosa',
+    indicacoes: [
+      'Dor aguda grave (pós-operatório, trauma, IAM)', 'Dor crônica oncológica',
+      'Edema agudo de pulmão (EAP cardiogênico — ↓ pré-carga e ansiedade)',
+      'Dispneia paliativa', 'Cólica biliar/renal (combinado com antiespasmódico)',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Dor aguda grave (titulação IV)', dose: '2–4 mg IV lento a cada 5–10 min até alívio (máx 10–15 mg)', via: 'IV' },
+        { indicacao: 'EAP cardiogênico', dose: '2–4 mg IV lento (uso controverso — considerar benefício)', via: 'IV' },
+        { indicacao: 'Dor crônica oncológica', dose: '5–15 mg VO 4/4h (comprimido liberação imediata) ou 30–60 mg 12/12h (liberação prolongada)', via: 'VO' },
+      ],
+      crianca: [
+        { indicacao: 'Dor aguda moderada-grave', dose: '0,05–0,1 mg/kg IV lento a cada 2–4h', via: 'IV' },
+      ]
+    },
+    interacoes: [
+      'Benzodiazepínicos (↑ depressão respiratória — combinação letal)', 'Álcool', 'IMAO',
+      'Outros depressores do SNC',
+    ],
+    efeitosAdversos: {
+      comuns: ['Constipação (sempre prescrevir laxante junto)', 'Náusea/vômito', 'Sedação', 'Prurido (IV)', 'Retenção urinária'],
+      graves: ['Depressão respiratória', 'Apneia', 'Hipotensão', 'Dependência física', 'Síndrome de abstinência'],
+    },
+    contraindicacoes: ['Depressão respiratória grave', 'Íleo paralítico', 'HIC (morfina no EAP — relativo)'],
+    monitoracao: ['FR (manter >12 irpm)', 'SatO₂', 'Nível de sedação (escala de Ramsay)', 'Função renal (acúmulo de morfina-6-glucuronídeo se IR)'],
+    perola: 'Naloxona (0,4 mg IV) reverte depressão respiratória. Titular em bolus de 0,04–0,1 mg a cada 2 min para não precipitar dor severa. Sempre prescrevir laxante ao iniciar morfina.',
+    blackBox: 'Risco de dependência, abuso e superdosagem. Combinação com benzodiazepínicos aumenta risco de morte.'
+  },
+
+  // ── Endócrino ────────────────────────────────────────────────
+  {
+    id: 'levotiroxina',
+    nome: 'Levotiroxina (T4)',
+    generico: 'levotiroxina sódica',
+    classe: 'Hormônio tireoidiano sintético',
+    categoria: 'Endócrino/Metabólico',
+    mecanismo: 'Análogo do T4 endógeno — convertido perifericamente em T3 (forma ativa) → regula metabolismo basal, crescimento e desenvolvimento',
+    indicacoes: [
+      'Hipotireoidismo primário (autoimune, pós-tireoidectomia, pós-iodo)', 'Hipotireoidismo congênito (triagem neonatal)',
+      'Coma mixedematoso', 'Tireoidite de Hashimoto sintomática',
+      'Supressão de TSH em carcinoma diferenciado de tireoide',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Hipotireoidismo adulto saudável', dose: '1,6–1,8 µg/kg/dia VO, dose única matinal em jejum', via: 'VO' },
+        { indicacao: 'Idoso ou cardiopata', dose: '25–50 µg/dia → ↑ 25 µg a cada 4–6 semanas conforme TSH', via: 'VO' },
+        { indicacao: 'Coma mixedematoso', dose: '200–400 µg IV dose única → 1,2–1,6 µg/kg/dia', via: 'IV' },
+      ],
+      crianca: [
+        { indicacao: 'Hipotireoidismo congênito', dose: '10–15 µg/kg/dia (lactentes) → ajustar pela faixa etária', via: 'VO' },
+      ]
+    },
+    interacoes: [
+      'Soja, ferro, cálcio, antiácidos (↓ absorção — tomar levotiroxina 2h antes)',
+      'Varfarina (↑ INR — ajustar anticoagulante)',
+      'Colestiramina / carbonato de cálcio (↓ absorção)',
+    ],
+    efeitosAdversos: {
+      comuns: ['Taquicardia', 'Palpitações', 'Insônia', 'Tremor', 'Diarreia — sinal de sobredosagem'],
+      graves: ['FA em idosos (dose excessiva)', 'Aceleração de angina ou IAM em coronariopata', 'Osteoporose em pós-menopausa com TSH suprimido'],
+    },
+    contraindicacoes: ['Hipertireoidismo não controlado', 'IM agudo recente sem hipotireoidismo prévio comprovado'],
+    monitoracao: ['TSH e T4L a cada 6–8 semanas até estabilização, depois anual', 'FC e PA — sintomas de tireotoxicose', 'Densidade óssea se TSH suprimido cronicamente'],
+    perola: 'Tomar em JEJUM (30–60 min antes do café) — absorção ↓ 30–40% com alimentos. Ajuste lento em idosos e coronariopatas para evitar angina.',
+    blackBox: null
+  },
+  {
+    id: 'metformina',
+    nome: 'Metformina',
+    generico: 'cloridrato de metformina',
+    classe: 'Biguanida',
+    categoria: 'Endócrino/Metabólico',
+    mecanismo: 'Ativa AMPK → ↓ gliconeogênese hepática (principal) + ↑ sensibilidade à insulina periférica + ↓ absorção intestinal de glicose',
+    indicacoes: [
+      'DM tipo 2 (primeira linha, independente do peso)', 'Pré-diabetes com alto risco (IMC ≥35 ou história de DG)',
+      'Síndrome dos ovários policísticos (off-label)', 'Prevenção de DM tipo 2',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'DM tipo 2 — início', dose: '500 mg 12/12h com refeições → ↑ 500 mg/semana conforme tolerância', via: 'VO' },
+        { indicacao: 'Dose máxima eficaz', dose: '2000 mg/dia (2g) — doses >2g têm pouco benefício adicional', via: 'VO' },
+        { indicacao: 'Formulação XR (lenta)', dose: '500–2000 mg/dia, 1×/dia ao jantar', via: 'VO' },
+      ],
+      crianca: [
+        { indicacao: 'DM tipo 2 >10 anos', dose: '500 mg 12/12h com refeições, máx 2g/dia', via: 'VO' },
+      ]
+    },
+    interacoes: ['Contraste iodado IV (suspender 48h antes e após — risco de acidose lática se IRA)', 'Álcool (↑ risco acidose lática)', 'Cimetidina (↑ nível de metformina)'],
+    efeitosAdversos: {
+      comuns: ['Diarreia', 'Náusea', 'Desconforto abdominal (melhora com alimentação e aumento gradual da dose)'],
+      graves: ['Acidose lática (raro — mais em IR, IC grave, hepáticos)', 'Deficiência de vitamina B12 (uso prolongado)'],
+    },
+    contraindicacoes: ['ClCr <30 mL/min (contraindicada) ou 30–45 mL/min (reduzir dose e monitorar)', 'Insuficiência hepática grave', 'Acidose metabólica', 'Contraste IV (suspensão temporária)'],
+    monitoracao: ['Creatinina + ClCr anualmente (ou antes de contraste)', 'Vitamina B12 a cada 1–2 anos', 'HbA1c a cada 3 meses até meta, depois 6 meses'],
+    perola: 'Metformina NÃO causa hipoglicemia em monoterapia. Suspender antes de cirurgia de grande porte e contrastes iodados. XR tem menos efeitos GI.',
+    blackBox: null
+  },
+
+  // ── Broncodilatadores ────────────────────────────────────────
+  {
+    id: 'salbutamol',
+    nome: 'Salbutamol (Albuterol)',
+    generico: 'sulfato de salbutamol',
+    classe: 'β₂-agonista de curta duração (SABA)',
+    categoria: 'Pneumologia / Emergência',
+    mecanismo: 'Agonista seletivo dos receptores β₂-adrenérgicos → relaxamento do músculo liso brônquico → broncodilatação em minutos',
+    indicacoes: [
+      'Asma aguda (crise leve a grave)', 'DPOC exacerbação aguda',
+      'Broncoespasmo induzido por exercício (profilaxia)', 'Hipercalemia grave (adjuvante — ↓ K+ transitório)',
+      'Tocolítico (pré-termo, off-label)',
+    ],
+    dosagem: {
+      adulto: [
+        { indicacao: 'Crise de asma — inalatório', dose: '2,5–5 mg nebulização OU 4–8 jatos (100 µg/jato) com espaçador, repetir a cada 20 min × 3', via: 'Inalatório' },
+        { indicacao: 'Manutenção (MDI)', dose: '1–2 jatos (100 µg cada) a cada 4–6h conforme necessidade', via: 'Inalatório' },
+        { indicacao: 'Hipercalemia', dose: '10–20 mg nebulizado (dose alta) em 15 min', via: 'Inalatório' },
+      ],
+      crianca: [
+        { indicacao: 'Crise de asma', dose: '0,15 mg/kg/dose (mín 2,5 mg) nebulização a cada 20 min × 3', via: 'Inalatório' },
+      ]
+    },
+    interacoes: ['Beta-bloqueadores (antagonismo — evitar; se necessário usar β₁-seletivo)', 'IMAO e antidepressivos tricíclicos (↑ efeitos cardiovasculares)'],
+    efeitosAdversos: {
+      comuns: ['Tremor fino de extremidades', 'Taquicardia', 'Palpitações', 'Hipocalemia (doses altas)'],
+      graves: ['Arritmia (dose excessiva IV)', 'Hipocalemia grave com doses repetidas', 'Paradoxal broncoespasmo (raro)'],
+    },
+    contraindicacoes: ['Hipersensibilidade a salbutamol', 'Taquiarritmias não controladas (relativo)'],
+    monitoracao: ['SpO₂ e ausculta após nebulização', 'Potássio sérico se doses frequentes', 'FC (manter <120 bpm em adultos)'],
+    perola: 'Uso >2×/semana fora da profilaxia = asma não controlada → revisar tratamento de manutenção. Técnica inalatória correta = criticamente importante para eficácia.',
+    blackBox: null
+  },
 ]

@@ -1,50 +1,97 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Timer, CheckSquare, Square, ChevronRight, RotateCcw, AlertTriangle, Search } from 'lucide-react'
+import { Timer, CheckSquare, Square, ChevronRight, RotateCcw, AlertTriangle, Search, BookOpen, RefreshCw } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
 import { AREA_COLOR } from '../utils/areaColors'
 
 function StationList({ onSelect }) {
+  const [tab, setTab] = useState('todas') // 'todas' | 'revisar'
   const [filter, setFilter] = useState('Todas')
   const [search, setSearch] = useState('')
   const { stationHistory } = useAppStore()
   const areas = ['Todas', ...new Set(STATIONS.map(s => s.area))]
 
+  // Estações com nota <70% para revisar
+  const toReview = useMemo(() => {
+    const byStation = {}
+    stationHistory.forEach(h => {
+      const pct = h.maxScore > 0 ? (h.score / h.maxScore) * 100 : 0
+      if (!byStation[h.stationId] || pct < byStation[h.stationId].pct) {
+        byStation[h.stationId] = { pct, date: h.date }
+      }
+    })
+    return STATIONS.filter(s => byStation[s.id] && byStation[s.id].pct < 70)
+      .map(s => ({ ...s, pct: Math.round(byStation[s.id].pct) }))
+      .sort((a, b) => a.pct - b.pct)
+  }, [stationHistory])
+
   const filtered = useMemo(() => {
+    if (tab === 'revisar') return toReview
     const q = search.toLowerCase()
     return STATIONS.filter(s => {
       const matchArea = filter === 'Todas' || s.area === filter
       const matchSearch = !q || s.titulo.toLowerCase().includes(q) || s.area.toLowerCase().includes(q) || s.enunciado.toLowerCase().includes(q) || s.nivel.toLowerCase().includes(q)
       return matchArea && matchSearch
     })
-  }, [filter, search])
+  }, [filter, search, tab, toReview])
 
   return (
     <div className="space-y-4">
-      {/* Busca */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-        <input
-          type="text"
-          placeholder="Buscar estação por tema, área ou palavra-chave..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-clinical-500"
-        />
+      {/* Abas */}
+      <div className="flex gap-2">
+        <button onClick={() => setTab('todas')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'todas' ? 'bg-clinical-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
+          <BookOpen size={14} /> Todas
+        </button>
+        <button onClick={() => setTab('revisar')}
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'revisar' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
+          <RefreshCw size={14} /> Revisar erros
+          {toReview.length > 0 && (
+            <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === 'revisar' ? 'bg-red-500' : 'bg-red-900/60 text-red-400'}`}>
+              {toReview.length}
+            </span>
+          )}
+        </button>
       </div>
-      {/* Filtro de área */}
-      <div className="flex gap-2 flex-wrap">
-        {areas.map(a => (
-          <button key={a} onClick={() => setFilter(a)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === a ? 'bg-clinical-600 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}>
-            {a}
-          </button>
-        ))}
-      </div>
-      <p className="text-xs text-gray-500">{filtered.length} estação{filtered.length !== 1 ? 'ões' : ''} encontrada{filtered.length !== 1 ? 's' : ''}</p>
+
+      {tab === 'todas' && (
+        <>
+          {/* Busca */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Buscar estação por tema, área ou palavra-chave..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-clinical-500"
+            />
+          </div>
+          {/* Filtro de área */}
+          <div className="flex gap-2 flex-wrap">
+            {areas.map(a => (
+              <button key={a} onClick={() => setFilter(a)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filter === a ? 'bg-clinical-600 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}>
+                {a}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {tab === 'revisar' && toReview.length === 0 && (
+        <div className="text-center py-10 text-gray-500">
+          <RefreshCw size={32} className="mx-auto mb-3 opacity-30" />
+          <p className="text-sm">Nenhuma estação abaixo de 70% ainda.</p>
+          <p className="text-xs mt-1">Pratique mais estações para ver aqui o que revisar!</p>
+        </div>
+      )}
+
+      <p className="text-xs text-gray-500">{filtered.length} estação{filtered.length !== 1 ? 'ões' : ''} {tab === 'revisar' ? 'para revisar' : 'encontrada' + (filtered.length !== 1 ? 's' : '')}</p>
       <div className="space-y-3">
         {filtered.map(s => {
           const done = stationHistory.some(h => h.stationId === s.id)
+          const reviewPct = tab === 'revisar' ? s.pct : null
           return (
             <button key={s.id} onClick={() => onSelect(s)}
               className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-xl p-4 transition-all">
@@ -54,7 +101,12 @@ function StationList({ onSelect }) {
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${AREA_COLOR[s.area] || 'bg-gray-700 text-gray-300'}`}>{s.area}</span>
                     <span className="text-xs text-gray-500">{s.nivel}</span>
                     <span className="text-xs text-gray-500">⏱ {s.tempo} min</span>
-                    {done && <span className="text-xs bg-green-900/40 text-green-400 px-2 py-0.5 rounded-full">✓ Feita</span>}
+                    {done && !reviewPct && <span className="text-xs bg-green-900/40 text-green-400 px-2 py-0.5 rounded-full">✓ Feita</span>}
+                    {reviewPct !== null && (
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${reviewPct < 50 ? 'bg-red-900/40 text-red-400' : 'bg-yellow-900/40 text-yellow-400'}`}>
+                        {reviewPct}% — revisar
+                      </span>
+                    )}
                   </div>
                   <p className="font-semibold text-white">{s.titulo}</p>
                   <p className="text-xs text-gray-400 mt-1 line-clamp-2">{s.enunciado.slice(0, 100)}...</p>
@@ -69,13 +121,24 @@ function StationList({ onSelect }) {
   )
 }
 
+const READING_TIME = 120 // 2 minutos para ler o enunciado
+
 function StationSession({ station, onBack }) {
   const { addStationHistory: addStationResult } = useAppStore()
   const [phase, setPhase] = useState('reading') // reading | active | results
   const [checked, setChecked] = useState({})
   const [timeLeft, setTimeLeft] = useState(station.tempo * 60)
+  const [readTimeLeft, setReadTimeLeft] = useState(READING_TIME)
   const [running, setRunning] = useState(false)
   const timerRef = useRef(null)
+  const readTimerRef = useRef(null)
+
+  // Timer de leitura
+  useEffect(() => {
+    if (phase !== 'reading') return
+    readTimerRef.current = setInterval(() => setReadTimeLeft(t => Math.max(0, t - 1)), 1000)
+    return () => clearInterval(readTimerRef.current)
+  }, [phase])
 
   useEffect(() => {
     if (running && timeLeft > 0) {
@@ -85,7 +148,11 @@ function StationSession({ station, onBack }) {
     return () => clearInterval(timerRef.current)
   }, [running, timeLeft])
 
-  const startSession = () => { setPhase('active'); setRunning(true) }
+  const startSession = () => {
+    clearInterval(readTimerRef.current)
+    setPhase('active')
+    setRunning(true)
+  }
 
   const finishSession = () => {
     clearInterval(timerRef.current)
@@ -112,9 +179,30 @@ function StationSession({ station, onBack }) {
   const score = calcScore()
   const pct = score.max > 0 ? (score.total / score.max) * 100 : 0
 
+  const readMins = Math.floor(readTimeLeft / 60)
+  const readSecs = readTimeLeft % 60
+  const readPct = (readTimeLeft / READING_TIME) * 100
+
   if (phase === 'reading') {
     return (
       <div className="space-y-4">
+        {/* Timer de leitura */}
+        <div className={`rounded-xl border p-3 flex items-center justify-between gap-3 transition-colors ${readTimeLeft <= 30 ? 'bg-red-900/20 border-red-700/40' : 'bg-gray-800 border-gray-700'}`}>
+          <div className="flex items-center gap-2">
+            <Timer size={16} className={readTimeLeft <= 30 ? 'text-red-400' : 'text-gray-400'} />
+            <div>
+              <p className={`text-xs font-semibold ${readTimeLeft <= 30 ? 'text-red-300' : 'text-gray-400'}`}>Tempo de leitura</p>
+              <p className="text-[10px] text-gray-500">Leia o enunciado e o roteiro do ator</p>
+            </div>
+          </div>
+          <span className={`font-mono font-bold text-xl ${readTimeLeft <= 30 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+            {String(readMins).padStart(2,'0')}:{String(readSecs).padStart(2,'0')}
+          </span>
+        </div>
+        <div className="h-1 bg-gray-800 rounded-full -mt-2">
+          <div className={`h-full rounded-full transition-all ${readTimeLeft <= 30 ? 'bg-red-500' : 'bg-blue-500'}`} style={{ width: `${readPct}%` }} />
+        </div>
+
         <div className="bg-gray-800 rounded-2xl border border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${AREA_COLOR[station.area] || 'bg-gray-700 text-gray-300'}`}>{station.area}</span>

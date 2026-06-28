@@ -284,6 +284,62 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* ── Progresso por Área ── */}
+        {stationHistory.length >= 1 && (() => {
+          const byArea = {}
+          STATIONS.forEach(s => { byArea[s.area] = { done: 0, total: 0, sumPct: 0 } })
+          STATIONS.forEach(s => { byArea[s.area].total += 1 })
+          stationHistory.forEach(h => {
+            const s = STATIONS.find(x => x.id === h.stationId)
+            if (!s) return
+            byArea[s.area].done = new Set([...Object.keys(byArea[s.area]).includes('ids') ? byArea[s.area].ids : [], h.stationId]).size
+          })
+          // recalculate done using Sets
+          const doneByArea = {}
+          stationHistory.forEach(h => {
+            const s = STATIONS.find(x => x.id === h.stationId)
+            if (!s) return
+            if (!doneByArea[s.area]) doneByArea[s.area] = new Set()
+            doneByArea[s.area].add(h.stationId)
+          })
+          const avgByArea = {}
+          stationHistory.forEach(h => {
+            const s = STATIONS.find(x => x.id === h.stationId)
+            if (!s) return
+            if (!avgByArea[s.area]) avgByArea[s.area] = { sum: 0, count: 0 }
+            avgByArea[s.area].sum += (h.score / h.maxScore) * 100
+            avgByArea[s.area].count += 1
+          })
+          const areas = Object.keys(byArea).filter(a => doneByArea[a]?.size > 0)
+          if (areas.length === 0) return null
+          return (
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-3">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Progresso por área</p>
+              {areas.map(area => {
+                const done = doneByArea[area]?.size || 0
+                const total = byArea[area].total
+                const avg = avgByArea[area] ? avgByArea[area].sum / avgByArea[area].count : 0
+                const pct = Math.round(avg)
+                return (
+                  <div key={area} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm text-gray-300 truncate">{area}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-gray-500">{done}/{total}</span>
+                        <span className={`text-xs font-bold ${pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>{pct}%</span>
+                      </div>
+                    </div>
+                    <div className="h-1.5 bg-gray-800 rounded-full">
+                      <div className={`h-full rounded-full transition-all ${pct >= 70 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                        style={{ width: `${Math.min((done / total) * 100, 100)}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })()}
+
         {/* ── Histórico Recente ── */}
         {recentStations.length > 0 ? (
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
