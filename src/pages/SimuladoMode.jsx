@@ -2,16 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { Timer, CheckSquare, Square, AlertTriangle, ChevronRight, Trophy, RotateCcw, Flame, Target } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
-
-const AREA_COLOR = {
-  'Clínica Médica':      'bg-blue-600/20 text-blue-400',
-  'Emergência':          'bg-red-600/20 text-red-400',
-  'Pediatria':           'bg-green-600/20 text-green-400',
-  'Gineco-Obstetrícia':  'bg-pink-600/20 text-pink-400',
-  'Cirurgia':            'bg-orange-600/20 text-orange-400',
-  'Saúde Mental':        'bg-purple-600/20 text-purple-400',
-  'Infectologia':        'bg-yellow-600/20 text-yellow-400',
-}
+import { AREA_COLOR } from '../utils/areaColors'
 
 function seededShuffle(arr, seed) {
   const a = [...arr]
@@ -73,8 +64,8 @@ function ConfigScreen({ onStart }) {
         <div className="grid grid-cols-3 gap-3 text-center">
           {[
             { label: 'Estações', value: count },
-            { label: 'Min por estação', value: '5' },
-            { label: 'Total', value: `${count * 5} min` },
+            { label: 'Min por estação', value: area === 'Aleatório' ? '5–10' : '5–10' },
+            { label: 'Área', value: area === 'Aleatório' ? 'Mista' : area.split(' ')[0] },
           ].map(({ label, value }) => (
             <div key={label} className="bg-gray-900 border border-gray-800 rounded-xl p-3">
               <p className="text-xl font-bold text-white">{value}</p>
@@ -95,7 +86,7 @@ function ConfigScreen({ onStart }) {
 // ── Sessão Ativa ──────────────────────────────────────────────
 function ActiveSession({ station, stationIdx, totalStations, runningScore, onFinish }) {
   const [checked, setChecked] = useState({})
-  const [timeLeft, setTimeLeft] = useState(5 * 60)
+  const [timeLeft, setTimeLeft] = useState(station.tempo * 60)
   const timerRef = useRef(null)
 
   useEffect(() => {

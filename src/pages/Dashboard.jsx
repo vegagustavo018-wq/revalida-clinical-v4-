@@ -19,7 +19,7 @@ function greeting() {
 }
 
 const QUICK_NAV = [
-  { to: '/estacoes',    icon: Stethoscope, label: 'Estações',     desc: '100 casos clínicos',    from: 'from-blue-600',    to_: 'to-blue-800'    },
+  { to: '/estacoes',    icon: Stethoscope, label: 'Estações',     desc: '150 casos clínicos',    from: 'from-blue-600',    to_: 'to-blue-800'    },
   { to: '/flashcards',  icon: CreditCard,  label: 'Flashcards',   desc: '200 cards temáticos',   from: 'from-violet-600',  to_: 'to-violet-800'  },
   { to: '/erros',       icon: ClipboardList,label: 'Erros',       desc: '60 erros comentados',   from: 'from-rose-600',    to_: 'to-rose-800'    },
   { to: '/referencias', icon: BookOpen,    label: 'Referências',  desc: 'Labs, critérios, fórmulas', from: 'from-amber-600', to_: 'to-amber-800' },
@@ -307,7 +307,7 @@ export default function Dashboard() {
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
             <Trophy size={36} className="mx-auto text-gray-700 mb-3" />
             <p className="text-white font-medium mb-1">Comece sua primeira estação!</p>
-            <p className="text-gray-500 text-sm mb-4">Pratique com 100 estações baseadas no formato Revalida.</p>
+            <p className="text-gray-500 text-sm mb-4">Pratique com 150 estações baseadas no formato Revalida.</p>
             <button
               onClick={() => navigate('/estacoes')}
               className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-colors"
