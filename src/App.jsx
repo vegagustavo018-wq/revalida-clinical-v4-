@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { Sidebar } from './components/Common/Sidebar'
 import { Header } from './components/Common/Header'
 import { BottomNav } from './components/Common/BottomNav'
+import { OnboardingModal } from './components/Tutorial/OnboardingModal'
 import { useAppStore } from './store/appStore'
 
 import Dashboard from './pages/Dashboard'
@@ -18,9 +19,12 @@ import DiagnosticAI from './pages/DiagnosticAI'
 function Layout() {
   const location = useLocation()
   const theme = useAppStore(s => s.theme)
+  const tutorialCompleted = useAppStore(s => s.tutorialCompleted)
+  const completeTutorial = useAppStore(s => s.completeTutorial)
 
   return (
     <div className={`${theme} flex h-screen bg-gray-950 text-gray-100 overflow-hidden`}>
+      {!tutorialCompleted && <OnboardingModal onClose={completeTutorial} />}
       {/* Sidebar — visível apenas em md+ */}
       <Sidebar />
 

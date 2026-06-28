@@ -1,10 +1,10 @@
 import { useAppStore } from '../store/appStore'
 import { Card } from '../components/UI/Card'
-import { Sun, Moon, Volume2, VolumeX, Trash2 } from 'lucide-react'
+import { Sun, Moon, Trash2, PlayCircle } from 'lucide-react'
 import { Button } from '../components/UI/Button'
 
 export default function Settings() {
-  const { theme, setTheme, sound, setSound, clearStationHistory } = useAppStore()
+  const { theme, setTheme, sound, setSound, clearStationHistory, resetTutorial } = useAppStore()
 
   return (
     <div className="overflow-y-auto h-full p-6 space-y-6 max-w-2xl">
@@ -64,6 +64,19 @@ export default function Settings() {
           </div>
           <Button variant="danger" size="sm" onClick={clearStationHistory}>
             <Trash2 size={14} /> Limpar
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="p-5 space-y-4">
+        <h3 className="text-white font-semibold">Ajuda</h3>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-gray-200 text-sm font-medium">Tutorial de boas-vindas</div>
+            <div className="text-gray-400 text-xs">Rever o tour de funcionalidades do app</div>
+          </div>
+          <Button variant="secondary" size="sm" onClick={resetTutorial}>
+            <PlayCircle size={14} /> Ver tutorial
           </Button>
         </div>
       </Card>

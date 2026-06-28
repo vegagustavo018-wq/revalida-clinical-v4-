@@ -69,4 +69,9 @@ export const useAppStore = create((set, get) => ({
     set({ analytics: updated })
     localStorage.setItem('analytics', JSON.stringify(updated))
   },
+
+  // Tutorial
+  tutorialCompleted: saved('tutorialCompleted', false),
+  completeTutorial: () => { set({ tutorialCompleted: true }); localStorage.setItem('tutorialCompleted', 'true') },
+  resetTutorial: () => { set({ tutorialCompleted: false }); localStorage.removeItem('tutorialCompleted') },
 }))
