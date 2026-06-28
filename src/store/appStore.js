@@ -74,4 +74,39 @@ export const useAppStore = create((set, get) => ({
   tutorialCompleted: saved('tutorialCompleted', false),
   completeTutorial: () => { set({ tutorialCompleted: true }); localStorage.setItem('tutorialCompleted', 'true') },
   resetTutorial: () => { set({ tutorialCompleted: false }); localStorage.removeItem('tutorialCompleted') },
+
+  // Streak & daily session
+  studyStreak: saved('studyStreak', 0),
+  lastStudyDate: saved('lastStudyDate', ''),
+  dailySessionDate: saved('dailySessionDate', ''),
+  dailySessionDone: saved('dailySessionDone', false),
+
+  markStudyToday: () => {
+    const today = new Date().toISOString().slice(0, 10)
+    const { lastStudyDate, studyStreak } = get()
+    if (lastStudyDate === today) return
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10)
+    const newStreak = lastStudyDate === yesterday ? studyStreak + 1 : 1
+    set({ studyStreak: newStreak, lastStudyDate: today })
+    localStorage.setItem('studyStreak', JSON.stringify(newStreak))
+    localStorage.setItem('lastStudyDate', JSON.stringify(today))
+  },
+
+  completeDailySession: () => {
+    const today = new Date().toISOString().slice(0, 10)
+    set({ dailySessionDone: true, dailySessionDate: today })
+    localStorage.setItem('dailySessionDone', 'true')
+    localStorage.setItem('dailySessionDate', JSON.stringify(today))
+    get().markStudyToday()
+  },
+
+  checkDailySession: () => {
+    const today = new Date().toISOString().slice(0, 10)
+    const { dailySessionDate } = get()
+    if (dailySessionDate !== today) {
+      set({ dailySessionDone: false, dailySessionDate: today })
+      localStorage.setItem('dailySessionDone', 'false')
+      localStorage.setItem('dailySessionDate', JSON.stringify(today))
+    }
+  },
 }))

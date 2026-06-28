@@ -1,67 +1,41 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BookOpen, MessageSquare, Stethoscope, FlaskConical, Zap, Brain, Target, TrendingUp, Clock } from 'lucide-react'
+import {
+  Stethoscope, CreditCard, ClipboardList, BookOpen,
+  Search, MessageSquare, Brain, Flame, Trophy,
+  TrendingUp, Clock, ChevronRight, Zap, CheckCircle
+} from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
 import { FLASHCARDS as PREMADE_FLASHCARDS } from '../data/flashcards/premadeFlashcards'
+import { DailySessionModal } from '../components/Dashboard/DailySessionModal'
 
-function StatCard({ icon: Icon, label, value, sub, color = 'clinical' }) {
-  const colors = {
-    clinical: 'bg-clinical-600/20 text-clinical-400',
-    green: 'bg-green-600/20 text-green-400',
-    purple: 'bg-purple-600/20 text-purple-400',
-    yellow: 'bg-yellow-600/20 text-yellow-400',
-    red: 'bg-red-600/20 text-red-400',
-  }
-  return (
-    <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${colors[color]}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-      <p className="text-2xl font-bold text-white">{value}</p>
-      <p className="text-sm text-gray-400">{label}</p>
-      {sub && <p className="text-xs text-gray-600 mt-1">{sub}</p>}
-    </div>
-  )
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Bom dia'
+  if (h < 18) return 'Boa tarde'
+  return 'Boa noite'
 }
 
-function QuickNav({ to, icon: Icon, label, desc, color }) {
-  const navigate = useNavigate()
-  const colors = {
-    blue: 'hover:border-blue-500/50 hover:bg-blue-900/10',
-    green: 'hover:border-green-500/50 hover:bg-green-900/10',
-    purple: 'hover:border-purple-500/50 hover:bg-purple-900/10',
-    yellow: 'hover:border-yellow-500/50 hover:bg-yellow-900/10',
-    orange: 'hover:border-orange-500/50 hover:bg-orange-900/10',
-    red: 'hover:border-red-500/50 hover:bg-red-900/10',
-  }
-  return (
-    <button onClick={() => navigate(to)}
-      className={`text-left bg-gray-800 border border-gray-700 rounded-2xl p-4 transition-all ${colors[color]}`}>
-      <Icon className={`w-6 h-6 mb-2 text-${color}-400`} />
-      <p className="font-semibold text-white text-sm">{label}</p>
-      <p className="text-xs text-gray-500 mt-1">{desc}</p>
-    </button>
-  )
-}
-
-function ProgressBar({ label, value, max, color = 'bg-clinical-600' }) {
-  const pct = max > 0 ? (value / max) * 100 : 0
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-sm">
-        <span className="text-gray-400">{label}</span>
-        <span className="text-gray-500">{value}/{max}</span>
-      </div>
-      <div className="h-2 bg-gray-700 rounded-full">
-        <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct}%` }} />
-      </div>
-    </div>
-  )
-}
+const QUICK_NAV = [
+  { to: '/estacoes',    icon: Stethoscope, label: 'Estações',     desc: '100 casos clínicos',    from: 'from-blue-600',    to_: 'to-blue-800'    },
+  { to: '/flashcards',  icon: CreditCard,  label: 'Flashcards',   desc: '200 cards temáticos',   from: 'from-violet-600',  to_: 'to-violet-800'  },
+  { to: '/erros',       icon: ClipboardList,label: 'Erros',       desc: '60 erros comentados',   from: 'from-rose-600',    to_: 'to-rose-800'    },
+  { to: '/referencias', icon: BookOpen,    label: 'Referências',  desc: 'Labs, critérios, fórmulas', from: 'from-amber-600', to_: 'to-amber-800' },
+  { to: '/explorador',  icon: Search,      label: 'Explorador',   desc: 'Doenças por sistema',   from: 'from-teal-600',    to_: 'to-teal-800'    },
+  { to: '/comunicacao', icon: MessageSquare,label: 'Comunicação', desc: '90 frases clínicas',    from: 'from-emerald-600', to_: 'to-emerald-800' },
+]
 
 export default function Dashboard() {
-  const { stationHistory, flashcardResults, favoriteFlashcards, favoritePhrases, myFlashcards } = useAppStore()
+  const navigate = useNavigate()
+  const {
+    stationHistory, flashcardResults, favoriteFlashcards, myFlashcards,
+    studyStreak, dailySessionDone, checkDailySession, completeDailySession, markStudyToday
+  } = useAppStore()
+
+  const [showDaily, setShowDaily] = useState(false)
+
+  useEffect(() => { checkDailySession() }, [])
 
   const stats = useMemo(() => {
     const stationsDone = new Set(stationHistory.map(h => h.stationId)).size
@@ -69,82 +43,184 @@ export default function Dashboard() {
     const avgScore = stationHistory.length > 0
       ? stationHistory.reduce((a, h) => a + (h.score / h.maxScore * 100), 0) / stationHistory.length
       : 0
-    return { stationsDone, flashcardsStudied, avgScore, favFl: favoriteFlashcards.length, favPhr: favoritePhrases.length }
-  }, [stationHistory, flashcardResults, favoriteFlashcards, favoritePhrases])
+    return { stationsDone, flashcardsStudied, avgScore }
+  }, [stationHistory, flashcardResults])
 
-  const recentStations = useMemo(() => {
-    return [...stationHistory]
+  const recentStations = useMemo(() =>
+    [...stationHistory]
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 3)
-      .map(h => {
-        const station = STATIONS.find(s => s.id === h.stationId)
-        return { ...h, titulo: station?.titulo || 'Estação' }
-      })
-  }, [stationHistory])
+      .map(h => ({ ...h, titulo: STATIONS.find(s => s.id === h.stationId)?.titulo || 'Estação' }))
+  , [stationHistory])
 
   const totalCards = PREMADE_FLASHCARDS.length + myFlashcards.length
+  const stationPct = Math.round((stats.stationsDone / STATIONS.length) * 100)
+  const flashPct = Math.round((stats.flashcardsStudied / totalCards) * 100)
+
+  const handleDailyComplete = () => {
+    completeDailySession()
+    setShowDaily(false)
+  }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="p-6 space-y-6">
-        {/* Welcome */}
-        <div className="bg-gradient-to-r from-clinical-900 to-gray-800 rounded-2xl border border-clinical-700/40 p-6">
-          <h1 className="text-2xl font-bold text-white mb-1">Revalida Clinical v4.0</h1>
-          <p className="text-clinical-300 text-sm">Sua plataforma de preparação para o Revalida 2ª fase.</p>
-          <div className="flex gap-4 mt-4 flex-wrap">
-            <div className="text-center"><p className="text-xl font-bold text-white">{STATIONS.length}</p><p className="text-xs text-gray-400">Estações</p></div>
-            <div className="w-px bg-gray-700" />
-            <div className="text-center"><p className="text-xl font-bold text-white">{totalCards}</p><p className="text-xs text-gray-400">Flashcards</p></div>
-            <div className="w-px bg-gray-700" />
-            <div className="text-center"><p className="text-xl font-bold text-white">90</p><p className="text-xs text-gray-400">Frases</p></div>
+    <div className="flex flex-col h-full overflow-y-auto bg-gray-950">
+      {showDaily && (
+        <DailySessionModal
+          onClose={() => setShowDaily(false)}
+          onComplete={handleDailyComplete}
+        />
+      )}
+
+      <div className="p-4 md:p-6 space-y-5 max-w-3xl mx-auto w-full">
+
+        {/* ── Saudação + Streak ── */}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-gray-400 text-sm">{greeting()},</p>
+            <h1 className="text-2xl font-bold text-white leading-tight">Revalida Clinical</h1>
           </div>
+          {studyStreak > 0 && (
+            <div className="flex flex-col items-center gap-0.5 bg-orange-950/50 border border-orange-700/40 rounded-2xl px-4 py-2.5 shrink-0">
+              <Flame size={22} className="text-orange-400" />
+              <p className="text-white font-bold text-lg leading-none">{studyStreak}</p>
+              <p className="text-orange-400 text-[10px] font-medium">dias</p>
+            </div>
+          )}
         </div>
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <StatCard icon={Target} label="Estações feitas" value={stats.stationsDone} sub={`de ${STATIONS.length} disponíveis`} color="clinical" />
-          <StatCard icon={TrendingUp} label="Nota média" value={stats.avgScore > 0 ? `${stats.avgScore.toFixed(0)}%` : '—'} sub="nas estações" color={stats.avgScore >= 70 ? 'green' : 'yellow'} />
-          <StatCard icon={Zap} label="Flashcards estudados" value={stats.flashcardsStudied} sub={`de ${totalCards} disponíveis`} color="purple" />
-          <StatCard icon={BookOpen} label="Flashcards favoritos" value={stats.favFl} color="yellow" />
-          <StatCard icon={MessageSquare} label="Frases favoritas" value={stats.favPhr} color="green" />
-          <StatCard icon={Brain} label="Flashcards criados" value={myFlashcards.length} sub="por você" color="red" />
+        {/* ── Sessão do Dia ── */}
+        <div
+          onClick={() => !dailySessionDone && setShowDaily(true)}
+          className={`rounded-2xl p-5 border transition-all ${
+            dailySessionDone
+              ? 'bg-emerald-950/40 border-emerald-700/40 cursor-default'
+              : 'bg-gradient-to-br from-blue-900/60 to-indigo-900/60 border-blue-700/40 cursor-pointer hover:border-blue-500/60 active:scale-[0.99]'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${
+                dailySessionDone ? 'bg-emerald-800/60' : 'bg-blue-700/50'
+              }`}>
+                {dailySessionDone
+                  ? <CheckCircle size={22} className="text-emerald-400" />
+                  : <Zap size={22} className="text-blue-300" />
+                }
+              </div>
+              <div>
+                <p className="text-white font-semibold text-sm">
+                  {dailySessionDone ? 'Sessão do dia concluída!' : 'Sessão do Dia'}
+                </p>
+                <p className={`text-xs mt-0.5 ${dailySessionDone ? 'text-emerald-400' : 'text-blue-300'}`}>
+                  {dailySessionDone
+                    ? 'Volte amanhã para continuar seu streak 🔥'
+                    : '10 flashcards · ~5 minutos · streak +1'
+                  }
+                </p>
+              </div>
+            </div>
+            {!dailySessionDone && (
+              <ChevronRight size={20} className="text-blue-400 shrink-0" />
+            )}
+          </div>
+
+          {/* Mini progress dots */}
+          {!dailySessionDone && (
+            <div className="flex gap-1 mt-4">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i} className="flex-1 h-1 rounded-full bg-blue-800/60" />
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Quick navigation */}
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            {
+              icon: Stethoscope, value: `${stats.stationsDone}`, label: 'Estações feitas',
+              sub: `de ${STATIONS.length}`, pct: stationPct, color: 'blue'
+            },
+            {
+              icon: TrendingUp,
+              value: stats.avgScore > 0 ? `${stats.avgScore.toFixed(0)}%` : '—',
+              label: 'Nota média', sub: 'nas estações',
+              pct: stats.avgScore, color: stats.avgScore >= 70 ? 'green' : 'yellow'
+            },
+            {
+              icon: CreditCard, value: `${stats.flashcardsStudied}`, label: 'Cards revistos',
+              sub: `de ${totalCards}`, pct: flashPct, color: 'violet'
+            },
+          ].map(({ icon: Icon, value, label, sub, pct, color }) => (
+            <div key={label} className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col gap-2">
+              <Icon size={18} className={`text-${color}-400`} />
+              <div>
+                <p className="text-xl font-bold text-white leading-none">{value}</p>
+                <p className="text-[11px] text-gray-400 mt-0.5">{label}</p>
+              </div>
+              {pct > 0 && (
+                <div className="h-1 bg-gray-800 rounded-full mt-auto">
+                  <div
+                    className={`h-full rounded-full bg-${color}-500`}
+                    style={{ width: `${Math.min(pct, 100)}%` }}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Acesso Rápido ── */}
         <div>
-          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Acesso rápido</h2>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Acesso rápido</p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <QuickNav to="/estacoes" icon={Target} label="Praticar Estação" desc="Simulação cronometrada" color="blue" />
-            <QuickNav to="/flashcards" icon={Zap} label="Estudar Flashcards" desc="Modo de revisão ativo" color="purple" />
-            <QuickNav to="/comunicacao" icon={MessageSquare} label="Hub de Comunicação" desc="90 frases clínicas" color="green" />
-            <QuickNav to="/explorador" icon={Brain} label="Explorar Doenças" desc="Navegação por sistemas" color="yellow" />
-            <QuickNav to="/referencias" icon={FlaskConical} label="Referências" desc="Labs, critérios, fórmulas" color="orange" />
-            <QuickNav to="/diagnostico" icon={Stethoscope} label="IA Diagnóstica" desc="Diagnóstico assistido por IA" color="red" />
+            {QUICK_NAV.map(({ to, icon: Icon, label, desc, from, to_ }) => (
+              <button
+                key={to}
+                onClick={() => navigate(to)}
+                className={`text-left rounded-2xl p-4 bg-gradient-to-br ${from} ${to_} opacity-90 hover:opacity-100 active:scale-[0.97] transition-all`}
+              >
+                <Icon size={20} className="text-white/80 mb-2" />
+                <p className="text-white font-semibold text-sm">{label}</p>
+                <p className="text-white/60 text-xs mt-0.5">{desc}</p>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Progress */}
-        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5">
-          <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Progresso</h2>
-          <div className="space-y-4">
-            <ProgressBar label="Estações concluídas" value={stats.stationsDone} max={STATIONS.length} color="bg-clinical-600" />
-            <ProgressBar label="Flashcards revisados" value={stats.flashcardsStudied} max={totalCards} color="bg-purple-600" />
-          </div>
+        {/* ── Progresso Geral ── */}
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Progresso geral</p>
+          {[
+            { label: 'Estações concluídas', value: stats.stationsDone, max: STATIONS.length, color: 'bg-blue-500' },
+            { label: 'Flashcards revisados', value: stats.flashcardsStudied, max: totalCards, color: 'bg-violet-500' },
+          ].map(({ label, value, max, color }) => (
+            <div key={label} className="space-y-1.5">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-400">{label}</span>
+                <span className="text-gray-500 text-xs">{value}/{max}</span>
+              </div>
+              <div className="h-1.5 bg-gray-800 rounded-full">
+                <div
+                  className={`h-full rounded-full ${color} transition-all`}
+                  style={{ width: `${max > 0 ? (value / max) * 100 : 0}%` }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Recent stations */}
-        {recentStations.length > 0 && (
-          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-5">
-            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Últimas estações</h2>
+        {/* ── Histórico Recente ── */}
+        {recentStations.length > 0 ? (
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Últimas estações</p>
             <div className="space-y-3">
               {recentStations.map((h, i) => {
                 const pct = h.maxScore > 0 ? (h.score / h.maxScore) * 100 : 0
                 return (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Clock className="w-4 h-4 text-gray-500 shrink-0" />
-                      <p className="text-sm text-gray-300 truncate">{h.titulo}</p>
-                    </div>
+                  <div key={i} className="flex items-center gap-3">
+                    <Clock size={15} className="text-gray-600 shrink-0" />
+                    <p className="text-sm text-gray-300 flex-1 truncate">{h.titulo}</p>
                     <span className={`text-sm font-bold shrink-0 ${pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
                       {pct.toFixed(0)}%
                     </span>
@@ -153,15 +229,20 @@ export default function Dashboard() {
               })}
             </div>
           </div>
-        )}
-
-        {recentStations.length === 0 && (
-          <div className="bg-gray-800 rounded-2xl border border-gray-700 p-8 text-center">
-            <p className="text-4xl mb-3">🎯</p>
+        ) : (
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 text-center">
+            <Trophy size={36} className="mx-auto text-gray-700 mb-3" />
             <p className="text-white font-medium mb-1">Comece sua primeira estação!</p>
-            <p className="text-gray-500 text-sm">Pratique com 15 estações baseadas no formato Revalida.</p>
+            <p className="text-gray-500 text-sm mb-4">Pratique com 100 estações baseadas no formato Revalida.</p>
+            <button
+              onClick={() => navigate('/estacoes')}
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-semibold transition-colors"
+            >
+              Ir para Estações
+            </button>
           </div>
         )}
+
       </div>
     </div>
   )
