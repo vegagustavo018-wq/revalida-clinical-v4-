@@ -23,7 +23,7 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <aside className={`relative flex flex-col bg-gray-900 border-r border-gray-700 transition-all duration-300 shrink-0
+    <aside className={`relative hidden md:flex flex-col bg-gray-900 border-r border-gray-700 transition-all duration-300 shrink-0
       ${collapsed ? 'w-16' : 'w-56'}`}>
       {/* Logo */}
       <div className={`flex items-center gap-3 px-4 py-5 border-b border-gray-700 ${collapsed ? 'justify-center' : ''}`}>
