@@ -1,12 +1,13 @@
 import { useState, useMemo } from 'react'
-import { Plus, BookOpen, Zap, RotateCcw, Heart, ChevronLeft, ChevronRight, CheckCircle, XCircle, Minus } from 'lucide-react'
+import { Plus, BookOpen, Zap, RotateCcw, Heart, CheckCircle, XCircle, Minus, Brain, AlertCircle } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { FLASHCARDS as PREMADE_FLASHCARDS } from '../data/flashcards/premadeFlashcards'
 
 const MODES = [
   { id: 'library', label: 'Biblioteca', icon: BookOpen },
-  { id: 'study', label: 'Estudar', icon: Zap },
-  { id: 'create', label: 'Criar', icon: Plus },
+  { id: 'study',   label: 'Estudar',    icon: Zap },
+  { id: 'revisao', label: 'Revisão',    icon: Brain },
+  { id: 'create',  label: 'Criar',      icon: Plus },
 ]
 
 const DIFF_COLOR = { Fácil: 'text-green-400 bg-green-900/30', Médio: 'text-yellow-400 bg-yellow-900/30', Difícil: 'text-red-400 bg-red-900/30' }
@@ -92,7 +93,7 @@ function LibraryMode({ allCards, favorites, onFavorite }) {
 }
 
 // ── Study Mode ────────────────────────────────────────────────
-function StudyMode({ allCards, onResult }) {
+function StudyMode({ allCards, onResult, onExit }) {
   const [idx, setIdx] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [results, setResults] = useState([]) // { id, result: 'easy'|'hard'|'skip' }
@@ -124,6 +125,11 @@ function StudyMode({ allCards, onResult }) {
           className="bg-clinical-600 hover:bg-clinical-700 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2">
           <RotateCcw className="w-4 h-4" /> Reiniciar
         </button>
+        {onExit && (
+          <button onClick={onExit} className="text-gray-500 hover:text-white text-sm transition-colors">
+            ← Voltar à revisão
+          </button>
+        )}
       </div>
     )
   }
@@ -168,6 +174,90 @@ function StudyMode({ allCards, onResult }) {
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+// ── Smart Review Mode ─────────────────────────────────────────
+function SmartReviewMode({ allCards, flashcardResults, onResult }) {
+  const [includeUnseen, setIncludeUnseen] = useState(false)
+  const [started, setStarted] = useState(false)
+
+  const hardCards = useMemo(
+    () => allCards.filter(c => flashcardResults[c.id] === 'hard'),
+    [allCards, flashcardResults]
+  )
+  const unseenCards = useMemo(
+    () => allCards.filter(c => !flashcardResults[c.id]),
+    [allCards, flashcardResults]
+  )
+  const deck = useMemo(
+    () => includeUnseen ? [...hardCards, ...unseenCards] : hardCards,
+    [hardCards, unseenCards, includeUnseen]
+  )
+
+  if (started && deck.length > 0) {
+    return <StudyMode allCards={deck} onResult={onResult} onExit={() => setStarted(false)} />
+  }
+
+  return (
+    <div className="max-w-lg mx-auto space-y-5 pt-4">
+      {/* Status */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="bg-red-950/40 border border-red-700/30 rounded-2xl p-4 text-center">
+          <p className="text-3xl font-black text-red-400">{hardCards.length}</p>
+          <p className="text-xs text-red-300 mt-1">marcados como difícil</p>
+        </div>
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 text-center">
+          <p className="text-3xl font-black text-gray-400">{unseenCards.length}</p>
+          <p className="text-xs text-gray-500 mt-1">ainda não estudados</p>
+        </div>
+      </div>
+
+      {hardCards.length === 0 && (
+        <div className="bg-green-950/30 border border-green-700/30 rounded-2xl p-5 flex gap-3 items-start">
+          <CheckCircle size={20} className="text-green-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-green-300 font-semibold text-sm">Nenhum card difícil!</p>
+            <p className="text-green-400/70 text-xs mt-0.5">Você ainda não marcou nenhum card como difícil. Estude pelo modo "Estudar" e marque os que não souber.</p>
+          </div>
+        </div>
+      )}
+
+      {hardCards.length > 0 && (
+        <div className="bg-amber-950/30 border border-amber-700/30 rounded-2xl p-4 flex gap-3 items-start">
+          <AlertCircle size={18} className="text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-amber-300 text-sm">Revise só os cards que você errou. Responda "Sabia!" para removê-los da fila de revisão.</p>
+        </div>
+      )}
+
+      {/* Opção: incluir não vistos */}
+      <button
+        onClick={() => setIncludeUnseen(v => !v)}
+        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-colors
+          ${includeUnseen ? 'bg-blue-900/20 border-blue-700/40' : 'bg-gray-900 border-gray-800 hover:border-gray-700'}`}
+      >
+        <div className="text-left">
+          <p className="text-white text-sm font-medium">Incluir cards não estudados</p>
+          <p className="text-gray-500 text-xs mt-0.5">Adiciona {unseenCards.length} cards novos ao deck de revisão</p>
+        </div>
+        <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${includeUnseen ? 'bg-blue-600' : 'bg-gray-700'}`}>
+          <div className={`w-4 h-4 rounded-full bg-white transition-transform ${includeUnseen ? 'translate-x-4' : 'translate-x-0'}`} />
+        </div>
+      </button>
+
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 flex justify-between text-sm">
+        <span className="text-gray-400">Total do deck</span>
+        <span className="text-white font-bold">{deck.length} cards</span>
+      </div>
+
+      <button
+        onClick={() => setStarted(true)}
+        disabled={deck.length === 0}
+        className="w-full py-4 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-base transition-all active:scale-[0.98]"
+      >
+        {deck.length === 0 ? 'Nenhum card para revisar' : `Revisar ${deck.length} card${deck.length !== 1 ? 's' : ''}`}
+      </button>
     </div>
   )
 }
@@ -227,8 +317,14 @@ function CreateMode({ onSave }) {
 // ── Main Page ──────────────────────────────────────────────────
 export default function Flashcards() {
   const [mode, setMode] = useState('library')
-  const { favoriteFlashcards, toggleFavoriteFlashcard, myFlashcards, addMyFlashcard, recordFlashcardResult: addFlashcardResult } = useAppStore()
+  const {
+    favoriteFlashcards, toggleFavoriteFlashcard,
+    myFlashcards, addMyFlashcard,
+    flashcardResults,
+    recordFlashcardResult: addFlashcardResult,
+  } = useAppStore()
   const allCards = useMemo(() => [...PREMADE_FLASHCARDS, ...myFlashcards], [myFlashcards])
+  const hardCount = useMemo(() => allCards.filter(c => flashcardResults[c.id] === 'hard').length, [allCards, flashcardResults])
 
   return (
     <div className="flex flex-col h-full">
@@ -237,16 +333,27 @@ export default function Flashcards() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-xl font-bold text-white">Flashcards 360°</h1>
-            <p className="text-sm text-gray-400">{allCards.length} flashcards · {favoriteFlashcards.length} favoritos · {myFlashcards.length} criados</p>
+            <p className="text-sm text-gray-400">{allCards.length} cards · {favoriteFlashcards.length} favoritos · {myFlashcards.length} criados</p>
           </div>
+          {hardCount > 0 && (
+            <button onClick={() => setMode('revisao')}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-900/30 border border-red-700/40 rounded-xl text-red-400 text-xs font-semibold hover:bg-red-900/50 transition-colors">
+              <Brain size={13} /> {hardCount} para revisar
+            </button>
+          )}
         </div>
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
           {MODES.map(m => {
             const Icon = m.icon
             return (
               <button key={m.id} onClick={() => setMode(m.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${mode === m.id ? 'bg-clinical-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-700'}`}>
-                <Icon className="w-4 h-4" /> {m.label}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors
+                  ${mode === m.id ? 'bg-clinical-600 text-white' : 'text-gray-400 hover:text-white hover:bg-gray-700'}`}>
+                <Icon className="w-4 h-4" />
+                {m.label}
+                {m.id === 'revisao' && hardCount > 0 && (
+                  <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">{hardCount}</span>
+                )}
               </button>
             )
           })}
@@ -255,9 +362,10 @@ export default function Flashcards() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
-        {mode === 'library' && <LibraryMode allCards={allCards} favorites={favoriteFlashcards} onFavorite={toggleFavoriteFlashcard} />}
-        {mode === 'study' && <StudyMode allCards={allCards} onResult={(id, r) => addFlashcardResult(id, r)} />}
-        {mode === 'create' && <CreateMode onSave={addMyFlashcard} />}
+        {mode === 'library'  && <LibraryMode allCards={allCards} favorites={favoriteFlashcards} onFavorite={toggleFavoriteFlashcard} />}
+        {mode === 'study'    && <StudyMode allCards={allCards} onResult={(id, r) => addFlashcardResult(id, r)} />}
+        {mode === 'revisao'  && <SmartReviewMode allCards={allCards} flashcardResults={flashcardResults} onResult={(id, r) => addFlashcardResult(id, r)} />}
+        {mode === 'create'   && <CreateMode onSave={addMyFlashcard} />}
       </div>
     </div>
   )

@@ -1,0 +1,22 @@
+{
+  "name": "Revalida Clinical v4.0",
+  "short_name": "Revalida",
+  "description": "Preparatório completo para o Revalida INEP — 2ª fase clínica",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#030712",
+  "theme_color": "#2563eb",
+  "lang": "pt-BR",
+  "categories": ["education", "medical"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
