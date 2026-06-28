@@ -23,6 +23,39 @@ export const useAppStore = create((set, get) => ({
   },
   clearStationHistory: () => { set({ stationHistory: [] }); localStorage.removeItem('stationHistory') },
 
+  // Favorite stations
+  favoriteStations: saved('favoriteStations', []),
+  toggleFavoriteStation: (id) => {
+    const favs = get().favoriteStations
+    const updated = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id]
+    set({ favoriteStations: updated })
+    localStorage.setItem('favoriteStations', JSON.stringify(updated))
+  },
+
+  // Reviewed diseases
+  reviewedDiseases: saved('reviewedDiseases', []),
+  toggleReviewedDisease: (id) => {
+    const revs = get().reviewedDiseases
+    const updated = revs.includes(id) ? revs.filter(r => r !== id) : [...revs, id]
+    set({ reviewedDiseases: updated })
+    localStorage.setItem('reviewedDiseases', JSON.stringify(updated))
+  },
+
+  // Simulado history
+  simuladoHistory: saved('simuladoHistory', []),
+  addSimuladoHistory: (record) => {
+    const updated = [record, ...get().simuladoHistory].slice(0, 50)
+    set({ simuladoHistory: updated })
+    localStorage.setItem('simuladoHistory', JSON.stringify(updated))
+  },
+
+  // Station search persistence
+  stationSearch: saved('stationSearch', ''),
+  setStationSearch: (q) => {
+    set({ stationSearch: q })
+    localStorage.setItem('stationSearch', JSON.stringify(q))
+  },
+
   // Flashcard favorites
   favoriteFlashcards: saved('favoriteFlashcards', []),
   toggleFavoriteFlashcard: (id) => {
@@ -41,6 +74,11 @@ export const useAppStore = create((set, get) => ({
   },
   removeMyFlashcard: (id) => {
     const updated = get().myFlashcards.filter(c => c.id !== id)
+    set({ myFlashcards: updated })
+    localStorage.setItem('myFlashcards', JSON.stringify(updated))
+  },
+  updateMyFlashcard: (id, updates) => {
+    const updated = get().myFlashcards.map(c => c.id === id ? { ...c, ...updates } : c)
     set({ myFlashcards: updated })
     localStorage.setItem('myFlashcards', JSON.stringify(updated))
   },
@@ -63,7 +101,7 @@ export const useAppStore = create((set, get) => ({
   },
 
   // Analytics
-  analytics: saved('analytics', { totalSessions: 0, totalTime: 0, bySpecialty: {} }),
+  analytics: saved('analytics', { totalSessions: 0, totalTime: 0 }),
   updateAnalytics: (data) => {
     const updated = { ...get().analytics, ...data }
     set({ analytics: updated })

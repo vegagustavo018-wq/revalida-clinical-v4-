@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { Timer, CheckSquare, Square, ChevronRight, RotateCcw, AlertTriangle, Search, BookOpen, RefreshCw } from 'lucide-react'
+import { Timer, CheckSquare, Square, ChevronRight, RotateCcw, AlertTriangle, Search, BookOpen, RefreshCw, Star } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
 import { AREA_COLOR } from '../utils/areaColors'
 
+const NIVEIS = ['Todos', 'Fundamental', 'Intermediário', 'Avançado']
+
 function StationList({ onSelect }) {
-  const [tab, setTab] = useState('todas') // 'todas' | 'revisar'
+  const [tab, setTab] = useState('todas') // 'todas' | 'favoritos' | 'revisar'
   const [filter, setFilter] = useState('Todas')
-  const [search, setSearch] = useState('')
-  const { stationHistory } = useAppStore()
+  const [nivel, setNivel] = useState('Todos')
+  const {
+    stationHistory,
+    stationSearch: search, setStationSearch: setSearch,
+    favoriteStations, toggleFavoriteStation,
+  } = useAppStore()
   const areas = ['Todas', ...new Set(STATIONS.map(s => s.area))]
 
-  // Estações com nota <70% para revisar
   const toReview = useMemo(() => {
     const byStation = {}
     stationHistory.forEach(h => {
@@ -27,36 +32,37 @@ function StationList({ onSelect }) {
 
   const filtered = useMemo(() => {
     if (tab === 'revisar') return toReview
+    if (tab === 'favoritos') return STATIONS.filter(s => favoriteStations.includes(s.id))
     const q = search.toLowerCase()
     return STATIONS.filter(s => {
       const matchArea = filter === 'Todas' || s.area === filter
+      const matchNivel = nivel === 'Todos' || s.nivel === nivel
       const matchSearch = !q || s.titulo.toLowerCase().includes(q) || s.area.toLowerCase().includes(q) || s.enunciado.toLowerCase().includes(q) || s.nivel.toLowerCase().includes(q)
-      return matchArea && matchSearch
+      return matchArea && matchNivel && matchSearch
     })
-  }, [filter, search, tab, toReview])
+  }, [filter, nivel, search, tab, toReview, favoriteStations])
+
+  const tabBtn = (id, label, icon, color, badge) => (
+    <button onClick={() => setTab(id)}
+      className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === id ? `${color} text-white` : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
+      {icon} {label}
+      {badge > 0 && (
+        <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === id ? 'bg-white/20' : 'bg-gray-700 text-gray-400'}`}>{badge}</span>
+      )}
+    </button>
+  )
 
   return (
     <div className="space-y-4">
       {/* Abas */}
-      <div className="flex gap-2">
-        <button onClick={() => setTab('todas')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'todas' ? 'bg-clinical-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
-          <BookOpen size={14} /> Todas
-        </button>
-        <button onClick={() => setTab('revisar')}
-          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${tab === 'revisar' ? 'bg-red-600 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}>
-          <RefreshCw size={14} /> Revisar erros
-          {toReview.length > 0 && (
-            <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold ${tab === 'revisar' ? 'bg-red-500' : 'bg-red-900/60 text-red-400'}`}>
-              {toReview.length}
-            </span>
-          )}
-        </button>
+      <div className="flex gap-2 flex-wrap">
+        {tabBtn('todas', 'Todas', <BookOpen size={14} />, 'bg-clinical-600', 0)}
+        {tabBtn('favoritos', 'Favoritas', <Star size={14} />, 'bg-yellow-600', favoriteStations.length)}
+        {tabBtn('revisar', 'Revisar erros', <RefreshCw size={14} />, 'bg-red-600', toReview.length)}
       </div>
 
       {tab === 'todas' && (
         <>
-          {/* Busca */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
@@ -66,6 +72,15 @@ function StationList({ onSelect }) {
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-clinical-500"
             />
+          </div>
+          {/* Filtro de dificuldade */}
+          <div className="flex gap-2 flex-wrap">
+            {NIVEIS.map(n => (
+              <button key={n} onClick={() => setNivel(n)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${nivel === n ? 'bg-purple-700 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}>
+                {n}
+              </button>
+            ))}
           </div>
           {/* Filtro de área */}
           <div className="flex gap-2 flex-wrap">
@@ -79,6 +94,14 @@ function StationList({ onSelect }) {
         </>
       )}
 
+      {tab === 'favoritos' && favoriteStations.length === 0 && (
+        <div className="text-center py-10 text-gray-500">
+          <Star size={32} className="mx-auto mb-3 opacity-30" />
+          <p className="text-sm">Nenhuma estação favoritada ainda.</p>
+          <p className="text-xs mt-1">Toque na estrela em qualquer estação para salvar aqui.</p>
+        </div>
+      )}
+
       {tab === 'revisar' && toReview.length === 0 && (
         <div className="text-center py-10 text-gray-500">
           <RefreshCw size={32} className="mx-auto mb-3 opacity-30" />
@@ -87,33 +110,41 @@ function StationList({ onSelect }) {
         </div>
       )}
 
-      <p className="text-xs text-gray-500">{filtered.length} estação{filtered.length !== 1 ? 'ões' : ''} {tab === 'revisar' ? 'para revisar' : 'encontrada' + (filtered.length !== 1 ? 's' : '')}</p>
+      <p className="text-xs text-gray-500">{filtered.length} estação{filtered.length !== 1 ? 'ões' : ''}</p>
       <div className="space-y-3">
         {filtered.map(s => {
           const done = stationHistory.some(h => h.stationId === s.id)
+          const isFav = favoriteStations.includes(s.id)
           const reviewPct = tab === 'revisar' ? s.pct : null
           return (
-            <button key={s.id} onClick={() => onSelect(s)}
-              className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-xl p-4 transition-all">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${AREA_COLOR[s.area] || 'bg-gray-700 text-gray-300'}`}>{s.area}</span>
-                    <span className="text-xs text-gray-500">{s.nivel}</span>
-                    <span className="text-xs text-gray-500">⏱ {s.tempo} min</span>
-                    {done && !reviewPct && <span className="text-xs bg-green-900/40 text-green-400 px-2 py-0.5 rounded-full">✓ Feita</span>}
-                    {reviewPct !== null && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${reviewPct < 50 ? 'bg-red-900/40 text-red-400' : 'bg-yellow-900/40 text-yellow-400'}`}>
-                        {reviewPct}% — revisar
-                      </span>
-                    )}
+            <div key={s.id} className="relative group">
+              <button onClick={() => onSelect(s)}
+                className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-xl p-4 transition-all pr-12">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${AREA_COLOR[s.area] || 'bg-gray-700 text-gray-300'}`}>{s.area}</span>
+                      <span className="text-xs text-gray-500">{s.nivel}</span>
+                      <span className="text-xs text-gray-500">⏱ {s.tempo} min</span>
+                      {done && !reviewPct && <span className="text-xs bg-green-900/40 text-green-400 px-2 py-0.5 rounded-full">✓ Feita</span>}
+                      {reviewPct !== null && (
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${reviewPct < 50 ? 'bg-red-900/40 text-red-400' : 'bg-yellow-900/40 text-yellow-400'}`}>
+                          {reviewPct}% — revisar
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-semibold text-white">{s.titulo}</p>
+                    <p className="text-xs text-gray-400 mt-1 line-clamp-2">{s.enunciado.slice(0, 100)}...</p>
                   </div>
-                  <p className="font-semibold text-white">{s.titulo}</p>
-                  <p className="text-xs text-gray-400 mt-1 line-clamp-2">{s.enunciado.slice(0, 100)}...</p>
+                  <ChevronRight className="w-5 h-5 text-gray-500 ml-3 shrink-0 mt-1" />
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-500 ml-3 shrink-0 mt-1" />
-              </div>
-            </button>
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); toggleFavoriteStation(s.id) }}
+                className={`absolute top-3 right-10 p-1.5 rounded-lg transition-colors ${isFav ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400'}`}>
+                <Star size={16} fill={isFav ? 'currentColor' : 'none'} />
+              </button>
+            </div>
           )
         })}
       </div>

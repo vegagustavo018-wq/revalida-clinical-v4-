@@ -175,13 +175,24 @@ function ActiveSession({ station, stationIdx, totalStations, runningScore, onFin
 
 // ── Resultados ────────────────────────────────────────────────
 function ResultsScreen({ stations, results, onRestart, onBack }) {
-  const { addStationHistory } = useAppStore()
+  const { addStationHistory, addSimuladoHistory, markStudyToday } = useAppStore()
   const [expandedStation, setExpandedStation] = useState(null)
 
   useEffect(() => {
+    const date = new Date().toISOString()
     results.forEach(r => {
-      addStationHistory({ stationId: r.station.id, score: r.score.total, maxScore: r.score.max, date: new Date().toISOString() })
+      addStationHistory({ stationId: r.station.id, score: r.score.total, maxScore: r.score.max, date })
     })
+    const totalScore = results.reduce((a, r) => a + r.score.total, 0)
+    const totalMax = results.reduce((a, r) => a + r.score.max, 0)
+    addSimuladoHistory({
+      date,
+      estacoes: results.map(r => ({ id: r.station.id, titulo: r.station.titulo, score: r.score.total, maxScore: r.score.max })),
+      totalScore,
+      totalMax,
+      pct: totalMax > 0 ? Math.round((totalScore / totalMax) * 100) : 0,
+    })
+    markStudyToday()
   }, [])
 
   const totalScore = results.reduce((a, r) => a + r.score.total, 0)

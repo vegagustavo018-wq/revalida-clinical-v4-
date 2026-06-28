@@ -1,9 +1,12 @@
 import { useState, useMemo } from 'react'
-import { ChevronRight, AlertTriangle, Stethoscope, FileText, Pill } from 'lucide-react'
+import { ChevronRight, AlertTriangle, Stethoscope, FileText, Pill, CheckCircle, Circle, Filter } from 'lucide-react'
 import { DISEASES } from '../data/diseases'
+import { useAppStore } from '../store/appStore'
 
 function DiseaseDetailCard({ disease }) {
   const [section, setSection] = useState('apresentacao')
+  const { reviewedDiseases, toggleReviewedDisease } = useAppStore()
+  const isReviewed = reviewedDiseases.includes(disease.id)
 
   const SECTIONS = [
     { id: 'apresentacao', label: 'Apresentação' },
@@ -18,10 +21,16 @@ function DiseaseDetailCard({ disease }) {
       {/* Title */}
       <div className="p-5 border-b border-gray-700 bg-clinical-900/30">
         <div className="flex items-start justify-between">
-          <div>
+          <div className="flex-1">
             <p className="text-xs text-clinical-400 font-medium mb-1">{disease.especialidade} · {disease.cid}</p>
             <h2 className="text-xl font-bold text-white">{disease.nome}</h2>
           </div>
+          <button
+            onClick={() => toggleReviewedDisease(disease.id)}
+            className={`flex items-center gap-1.5 ml-3 shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors ${isReviewed ? 'bg-green-900/40 text-green-400 border border-green-700/40' : 'bg-gray-700 text-gray-400 hover:text-green-400 border border-gray-600'}`}>
+            {isReviewed ? <CheckCircle size={14} /> : <Circle size={14} />}
+            {isReviewed ? 'Revisada' : 'Marcar como revisada'}
+          </button>
         </div>
         <p className="text-gray-300 text-sm mt-2">{disease.descricao}</p>
       </div>
@@ -108,6 +117,8 @@ export default function Explorer() {
   const [sintoma, setSintoma] = useState(null)
   const [disease, setDisease] = useState(null)
   const [search, setSearch] = useState('')
+  const [soNaoRevisadas, setSoNaoRevisadas] = useState(false)
+  const { reviewedDiseases } = useAppStore()
 
   const allDiseases = useMemo(() => {
     return DISEASES.flatMap(s => s.sintomas.flatMap(sin => sin.doencas.map(d => ({ ...d, sistema: s.sistema, sintoma: sin.sintoma }))))
@@ -169,6 +180,19 @@ export default function Explorer() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
+        {/* Filtro revisadas — aparece nos níveis 1, 2 e 3 */}
+        {!disease && !search && (
+          <div className="flex items-center gap-2 mb-4">
+            <button
+              onClick={() => setSoNaoRevisadas(v => !v)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors border ${soNaoRevisadas ? 'bg-green-900/30 border-green-700/40 text-green-400' : 'bg-gray-800 border-gray-700 text-gray-400 hover:text-white'}`}>
+              <Filter size={12} />
+              Só não revisadas
+            </button>
+            <span className="text-xs text-gray-600">{reviewedDiseases.length} doenças revisadas</span>
+          </div>
+        )}
+
         {/* Search results */}
         {search.length >= 2 && (
           <div className="space-y-2 mb-4">
@@ -176,8 +200,13 @@ export default function Explorer() {
             {searchResults.map(d => (
               <button key={d.id} onClick={() => selectDisease(d)}
                 className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-xl p-4 transition-colors">
-                <p className="text-white font-medium">{d.nome}</p>
-                <p className="text-xs text-gray-500 mt-1">{d.sistema} → {d.sintoma}</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white font-medium">{d.nome}</p>
+                    <p className="text-xs text-gray-500 mt-1">{d.sistema} → {d.sintoma}</p>
+                  </div>
+                  {reviewedDiseases.includes(d.id) && <CheckCircle size={16} className="text-green-400 shrink-0" />}
+                </div>
               </button>
             ))}
             {searchResults.length === 0 && <p className="text-gray-500 text-sm">Nenhuma doença encontrada.</p>}
@@ -187,37 +216,46 @@ export default function Explorer() {
         {/* Level 1: Sistemas */}
         {!sistema && !search && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {DISEASES.map(s => (
-              <button key={s.sistema} onClick={() => setSistema(s.sistema)}
-                className="bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-2xl p-5 text-center transition-all group">
-                <div className="text-4xl mb-3">{s.icone}</div>
-                <p className="font-semibold text-white group-hover:text-clinical-400 transition-colors">{s.sistema}</p>
-                <p className="text-xs text-gray-500 mt-1">{s.sintomas.reduce((a, sin) => a + sin.doencas.length, 0)} doenças</p>
-              </button>
-            ))}
+            {DISEASES.map(s => {
+              const total = s.sintomas.reduce((a, sin) => a + sin.doencas.length, 0)
+              const revisadas = s.sintomas.reduce((a, sin) => a + sin.doencas.filter(d => reviewedDiseases.includes(d.id)).length, 0)
+              return (
+                <button key={s.sistema} onClick={() => setSistema(s.sistema)}
+                  className="bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-2xl p-5 text-center transition-all group">
+                  <div className="text-4xl mb-3">{s.icone}</div>
+                  <p className="font-semibold text-white group-hover:text-clinical-400 transition-colors">{s.sistema}</p>
+                  <p className="text-xs text-gray-500 mt-1">{revisadas}/{total} revisadas</p>
+                </button>
+              )
+            })}
           </div>
         )}
 
         {/* Level 2: Sintomas */}
         {sistema && !sintoma && !search && (
           <div className="space-y-3">
-            {selectedSistema?.sintomas.map(s => (
-              <button key={s.sintoma} onClick={() => setSintoma(s.sintoma)}
-                className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-xl p-4 flex items-center justify-between transition-all">
-                <div>
-                  <p className="font-semibold text-white">{s.sintoma}</p>
-                  <p className="text-xs text-gray-500 mt-1">{s.doencas.length} doenças</p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-500" />
-              </button>
-            ))}
+            {selectedSistema?.sintomas.map(s => {
+              const revisadas = s.doencas.filter(d => reviewedDiseases.includes(d.id)).length
+              return (
+                <button key={s.sintoma} onClick={() => setSintoma(s.sintoma)}
+                  className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-xl p-4 flex items-center justify-between transition-all">
+                  <div>
+                    <p className="font-semibold text-white">{s.sintoma}</p>
+                    <p className="text-xs text-gray-500 mt-1">{revisadas}/{s.doencas.length} revisadas</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-500" />
+                </button>
+              )
+            })}
           </div>
         )}
 
         {/* Level 3: Doenças */}
         {sintoma && !disease && !search && (
           <div className="space-y-3">
-            {selectedSintoma?.doencas.map(d => (
+            {selectedSintoma?.doencas
+              .filter(d => !soNaoRevisadas || !reviewedDiseases.includes(d.id))
+              .map(d => (
               <button key={d.id} onClick={() => setDisease(d)}
                 className="w-full text-left bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-clinical-600 rounded-xl p-4 flex items-center justify-between transition-all">
                 <div>
@@ -227,7 +265,9 @@ export default function Explorer() {
                     <span className="text-xs bg-clinical-900/40 text-clinical-400 px-2 py-0.5 rounded">{d.especialidade}</span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-500" />
+                {reviewedDiseases.includes(d.id)
+                  ? <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />
+                  : <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />}
               </button>
             ))}
           </div>

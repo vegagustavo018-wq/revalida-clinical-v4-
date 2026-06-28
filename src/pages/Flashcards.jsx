@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react'
-import { Plus, BookOpen, Zap, RotateCcw, Heart, CheckCircle, XCircle, Minus, Brain, AlertCircle } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { Plus, BookOpen, Zap, RotateCcw, Heart, CheckCircle, XCircle, Minus, Brain, AlertCircle, Pencil, Trash2, X } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { FLASHCARDS as PREMADE_FLASHCARDS } from '../data/flashcards/premadeFlashcards'
 
@@ -12,20 +12,88 @@ const MODES = [
 
 const DIFF_COLOR = { Fácil: 'text-green-400 bg-green-900/30', Médio: 'text-yellow-400 bg-yellow-900/30', Difícil: 'text-red-400 bg-red-900/30' }
 
+// ── Edit Modal ────────────────────────────────────────────────
+function EditCardModal({ card, onSave, onClose }) {
+  const [form, setForm] = useState({ frente: card.frente, verso: card.verso, dica: card.dica || '', categoria: card.categoria, dificuldade: card.dificuldade, especialidade: card.especialidade })
+  const update = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-end md:items-center justify-center p-4">
+      <div className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg space-y-4 p-5 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between">
+          <h3 className="text-white font-bold">Editar Flashcard</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white"><X size={20} /></button>
+        </div>
+        {[
+          { k: 'frente', label: 'Pergunta', multi: true },
+          { k: 'verso',  label: 'Resposta', multi: true },
+          { k: 'dica',   label: 'Dica (opcional)', multi: false },
+        ].map(f => (
+          <div key={f.k}>
+            <label className="text-sm text-gray-400 block mb-1">{f.label}</label>
+            {f.multi
+              ? <textarea rows={3} value={form[f.k]} onChange={e => update(f.k, e.target.value)}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-xl border border-gray-600 focus:border-clinical-500 focus:outline-none text-sm resize-none" />
+              : <input type="text" value={form[f.k]} onChange={e => update(f.k, e.target.value)}
+                  className="w-full bg-gray-700 text-white px-4 py-3 rounded-xl border border-gray-600 focus:border-clinical-500 focus:outline-none text-sm" />
+            }
+          </div>
+        ))}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { k: 'categoria', options: ['Diagnóstico', 'Tratamento', 'Farmacologia', 'Comunicação', 'Exames'] },
+            { k: 'dificuldade', options: ['Fácil', 'Médio', 'Difícil'] },
+            { k: 'especialidade', options: ['Clínica Médica', 'Cirurgia', 'Pediatria', 'GO', 'Saúde Mental', 'Preventiva'] },
+          ].map(s => (
+            <div key={s.k}>
+              <label className="text-xs text-gray-400 block mb-1 capitalize">{s.k}</label>
+              <select value={form[s.k]} onChange={e => update(s.k, e.target.value)}
+                className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-clinical-500 focus:outline-none text-sm">
+                {s.options.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3 pt-2">
+          <button onClick={onClose} className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-xl font-medium transition-colors">Cancelar</button>
+          <button onClick={() => { onSave(form); onClose() }} disabled={!form.frente || !form.verso}
+            className="flex-1 bg-clinical-600 hover:bg-clinical-700 disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors">
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── FlipCard ──────────────────────────────────────────────────
-function FlipCard({ card, onFavorite, isFavorite }) {
+function FlipCard({ card, onFavorite, isFavorite, onEdit, onDelete, isOwned }) {
   const [flipped, setFlipped] = useState(false)
   return (
     <div className="flip-card w-full h-72 cursor-pointer" onClick={() => setFlipped(f => !f)}>
       <div className={`flip-card-inner ${flipped ? 'flipped' : ''}`}>
         {/* Front */}
         <div className="flip-card-front bg-gray-800 border border-gray-700 rounded-2xl p-6 flex flex-col justify-between">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-2">
             <span className={`text-xs px-2 py-1 rounded-full font-medium ${DIFF_COLOR[card.dificuldade]}`}>{card.dificuldade}</span>
-            <button onClick={e => { e.stopPropagation(); onFavorite(card.id) }}
-              className={`${isFavorite ? 'text-red-400' : 'text-gray-500 hover:text-red-400'} transition-colors`}>
-              <Heart className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} />
-            </button>
+            <div className="flex items-center gap-1">
+              {isOwned && (
+                <>
+                  <button onClick={e => { e.stopPropagation(); onEdit(card) }}
+                    className="text-gray-500 hover:text-clinical-400 transition-colors p-1">
+                    <Pencil size={14} />
+                  </button>
+                  <button onClick={e => { e.stopPropagation(); onDelete(card.id) }}
+                    className="text-gray-500 hover:text-red-400 transition-colors p-1">
+                    <Trash2 size={14} />
+                  </button>
+                </>
+              )}
+              <button onClick={e => { e.stopPropagation(); onFavorite(card.id) }}
+                className={`${isFavorite ? 'text-red-400' : 'text-gray-500 hover:text-red-400'} transition-colors`}>
+                <Heart className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} />
+              </button>
+            </div>
           </div>
           <div className="flex-1 flex items-center justify-center">
             <p className="text-white text-lg font-medium text-center leading-relaxed">{card.frente}</p>
@@ -61,9 +129,10 @@ function FlipCard({ card, onFavorite, isFavorite }) {
 }
 
 // ── Library Mode ──────────────────────────────────────────────
-function LibraryMode({ allCards, favorites, onFavorite }) {
+function LibraryMode({ allCards, favorites, onFavorite, myCardIds, onEdit, onDelete }) {
   const [filter, setFilter] = useState('Todos')
   const [search, setSearch] = useState('')
+  const [editCard, setEditCard] = useState(null)
   const cats = useMemo(() => ['Todos', ...new Set(allCards.map(c => c.categoria))], [allCards])
   const filtered = useMemo(() => allCards.filter(c => {
     const matchCat = filter === 'Todos' || c.categoria === filter
@@ -73,6 +142,13 @@ function LibraryMode({ allCards, favorites, onFavorite }) {
 
   return (
     <div className="space-y-4">
+      {editCard && (
+        <EditCardModal
+          card={editCard}
+          onSave={(updates) => onEdit(editCard.id, updates)}
+          onClose={() => setEditCard(null)}
+        />
+      )}
       <div className="flex gap-2 flex-wrap">
         <input type="text" placeholder="Buscar flashcard..." value={search} onChange={e => setSearch(e.target.value)}
           className="flex-1 min-w-48 bg-gray-700 text-white px-4 py-2 rounded-xl border border-gray-600 focus:border-clinical-500 focus:outline-none text-sm" />
@@ -84,7 +160,15 @@ function LibraryMode({ allCards, favorites, onFavorite }) {
       <p className="text-sm text-gray-500">{filtered.length} flashcards</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map(card => (
-          <FlipCard key={card.id} card={card} onFavorite={onFavorite} isFavorite={favorites.includes(card.id)} />
+          <FlipCard
+            key={card.id}
+            card={card}
+            onFavorite={onFavorite}
+            isFavorite={favorites.includes(card.id)}
+            isOwned={myCardIds.has(card.id)}
+            onEdit={setEditCard}
+            onDelete={onDelete}
+          />
         ))}
       </div>
       {filtered.length === 0 && <p className="text-gray-500 text-center py-12">Nenhum flashcard encontrado.</p>}
@@ -98,6 +182,11 @@ function StudyMode({ allCards, onResult, onExit }) {
   const [flipped, setFlipped] = useState(false)
   const [results, setResults] = useState([]) // { id, result: 'easy'|'hard'|'skip' }
   const [finished, setFinished] = useState(false)
+  const { markStudyToday } = useAppStore()
+
+  useEffect(() => {
+    if (finished) markStudyToday()
+  }, [finished])
 
   const card = allCards[idx]
   const progress = (idx / allCards.length) * 100
@@ -319,11 +408,12 @@ export default function Flashcards() {
   const [mode, setMode] = useState('library')
   const {
     favoriteFlashcards, toggleFavoriteFlashcard,
-    myFlashcards, addMyFlashcard,
+    myFlashcards, addMyFlashcard, removeMyFlashcard, updateMyFlashcard,
     flashcardResults,
     recordFlashcardResult: addFlashcardResult,
   } = useAppStore()
   const allCards = useMemo(() => [...PREMADE_FLASHCARDS, ...myFlashcards], [myFlashcards])
+  const myCardIds = useMemo(() => new Set(myFlashcards.map(c => c.id)), [myFlashcards])
   const hardCount = useMemo(() => allCards.filter(c => flashcardResults[c.id] === 'hard').length, [allCards, flashcardResults])
 
   return (
@@ -362,7 +452,7 @@ export default function Flashcards() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-6">
-        {mode === 'library'  && <LibraryMode allCards={allCards} favorites={favoriteFlashcards} onFavorite={toggleFavoriteFlashcard} />}
+        {mode === 'library'  && <LibraryMode allCards={allCards} favorites={favoriteFlashcards} onFavorite={toggleFavoriteFlashcard} myCardIds={myCardIds} onEdit={(id, updates) => updateMyFlashcard(id, updates)} onDelete={removeMyFlashcard} />}
         {mode === 'study'    && <StudyMode allCards={allCards} onResult={(id, r) => addFlashcardResult(id, r)} />}
         {mode === 'revisao'  && <SmartReviewMode allCards={allCards} flashcardResults={flashcardResults} onResult={(id, r) => addFlashcardResult(id, r)} />}
         {mode === 'create'   && <CreateMode onSave={addMyFlashcard} />}
