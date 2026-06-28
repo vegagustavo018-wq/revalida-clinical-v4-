@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   Stethoscope, CreditCard, ClipboardList, BookOpen,
   Search, MessageSquare, Brain, Flame, Trophy,
-  TrendingUp, Clock, ChevronRight, Zap, CheckCircle
+  TrendingUp, Clock, ChevronRight, Zap, CheckCircle,
+  Target, AlertCircle
 } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
@@ -52,6 +53,32 @@ export default function Dashboard() {
       .slice(0, 3)
       .map(h => ({ ...h, titulo: STATIONS.find(s => s.id === h.stationId)?.titulo || 'Estação' }))
   , [stationHistory])
+
+  // Análise de pontos fracos por área
+  const weakAreas = useMemo(() => {
+    if (stationHistory.length < 2) return []
+    const byArea = {}
+    stationHistory.forEach(h => {
+      const station = STATIONS.find(s => s.id === h.stationId)
+      if (!station) return
+      const area = station.area
+      if (!byArea[area]) byArea[area] = { total: 0, sum: 0, count: 0 }
+      byArea[area].sum += (h.score / h.maxScore) * 100
+      byArea[area].count += 1
+    })
+    return Object.entries(byArea)
+      .map(([area, d]) => ({ area, avg: d.sum / d.count, count: d.count }))
+      .sort((a, b) => a.avg - b.avg)
+      .slice(0, 3)
+  }, [stationHistory])
+
+  const recommendedStation = useMemo(() => {
+    if (weakAreas.length === 0) return null
+    const worstArea = weakAreas[0].area
+    const doneIds = new Set(stationHistory.map(h => h.stationId))
+    return STATIONS.find(s => s.area === worstArea && !doneIds.has(s.id))
+      || STATIONS.find(s => s.area === worstArea)
+  }, [weakAreas, stationHistory])
 
   const totalCards = PREMADE_FLASHCARDS.length + myFlashcards.length
   const stationPct = Math.round((stats.stationsDone / STATIONS.length) * 100)
@@ -169,6 +196,51 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+
+        {/* ── Pontos Fracos ── */}
+        {weakAreas.length >= 2 && (
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle size={16} className="text-amber-400" />
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Seus pontos fracos</p>
+            </div>
+
+            <div className="space-y-3">
+              {weakAreas.map(({ area, avg, count }) => {
+                const pct = Math.round(avg)
+                const color = pct >= 70 ? 'bg-green-500' : pct >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                const textColor = pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
+                return (
+                  <div key={area} className="space-y-1.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-300">{area}</span>
+                      <span className={`text-xs font-bold ${textColor}`}>{pct}% · {count} estação{count !== 1 ? 'ões' : ''}</span>
+                    </div>
+                    <div className="h-1.5 bg-gray-800 rounded-full">
+                      <div className={`h-full rounded-full ${color} transition-all`} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {recommendedStation && (
+              <button
+                onClick={() => navigate('/estacoes')}
+                className="w-full flex items-center justify-between gap-3 bg-amber-950/40 border border-amber-700/30 rounded-xl px-4 py-3 hover:bg-amber-950/60 active:scale-[0.99] transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <Target size={18} className="text-amber-400 shrink-0" />
+                  <div className="text-left">
+                    <p className="text-amber-300 text-xs font-semibold">Recomendação</p>
+                    <p className="text-white text-sm font-medium">{recommendedStation.titulo}</p>
+                  </div>
+                </div>
+                <ChevronRight size={16} className="text-amber-400 shrink-0" />
+              </button>
+            )}
+          </div>
+        )}
 
         {/* ── Acesso Rápido ── */}
         <div>

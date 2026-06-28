@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import { Timer, CheckSquare, Square, ChevronRight, RotateCcw, Star, AlertTriangle } from 'lucide-react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import { Timer, CheckSquare, Square, ChevronRight, RotateCcw, AlertTriangle, Search } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { STATIONS } from '../data/officialStations'
 
@@ -15,12 +15,33 @@ const AREA_COLOR = {
 
 function StationList({ onSelect }) {
   const [filter, setFilter] = useState('Todas')
+  const [search, setSearch] = useState('')
   const { stationHistory } = useAppStore()
   const areas = ['Todas', ...new Set(STATIONS.map(s => s.area))]
-  const filtered = filter === 'Todas' ? STATIONS : STATIONS.filter(s => s.area === filter)
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase()
+    return STATIONS.filter(s => {
+      const matchArea = filter === 'Todas' || s.area === filter
+      const matchSearch = !q || s.titulo.toLowerCase().includes(q) || s.area.toLowerCase().includes(q) || s.enunciado.toLowerCase().includes(q) || s.nivel.toLowerCase().includes(q)
+      return matchArea && matchSearch
+    })
+  }, [filter, search])
 
   return (
     <div className="space-y-4">
+      {/* Busca */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Buscar estação por tema, área ou palavra-chave..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="w-full pl-9 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-clinical-500"
+        />
+      </div>
+      {/* Filtro de área */}
       <div className="flex gap-2 flex-wrap">
         {areas.map(a => (
           <button key={a} onClick={() => setFilter(a)}
@@ -29,6 +50,7 @@ function StationList({ onSelect }) {
           </button>
         ))}
       </div>
+      <p className="text-xs text-gray-500">{filtered.length} estação{filtered.length !== 1 ? 'ões' : ''} encontrada{filtered.length !== 1 ? 's' : ''}</p>
       <div className="space-y-3">
         {filtered.map(s => {
           const done = stationHistory.some(h => h.stationId === s.id)
